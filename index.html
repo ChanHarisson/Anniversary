@@ -1547,7 +1547,7 @@ function setPagePhoto(idx){
 
 /* ── Show a specific page with flip animation ── */
 function showPage(idx, direction){
-  if(isFlipping) return;
+  if(isFlipping) return false;
   isFlipping = true;
 
   const pageEl = document.getElementById('bookPageRight');
@@ -1573,20 +1573,25 @@ function showPage(idx, direction){
     pageEl.classList.remove('no-transition');
     isFlipping = false;
   }, PAGE_FLIP_MS);
+  return true;
 }
 
 /* ── Auto advance pages ── */
 function schedulePageAuto(){
   clearTimeout(photoAutoTimer);
   photoAutoTimer = setTimeout(()=>{
-    if(bookIsOpen){
-      if(cur < photos.length - 1){
-        showPage(cur + 1, 'next');
+    if(!bookIsOpen) return;
+    if(cur < photos.length - 1){
+      const advanced = showPage(cur + 1, 'next');
+      if(advanced){
         schedulePageAuto();
       } else {
-        // last page — close and reveal heart
-        setTimeout(()=>{ closeBookAndReveal(); }, 1800);
+        // If a transition is still running, retry shortly instead of stalling.
+        photoAutoTimer = setTimeout(schedulePageAuto, 260);
       }
+    } else {
+      // last page — close and reveal heart
+      setTimeout(()=>{ closeBookAndReveal(); }, 1800);
     }
   }, PHOTO_AUTO_MS);
 }
