@@ -1626,6 +1626,7 @@ galleryObserver.observe(gallerySection);
 
 /* ── Open book ── */
 function openBook(){
+  introContinued = true;
   clearInterval(bookAutoInterval);
   autoScrollActive = false;
   cancelAnimationFrame(autoScrollRAF);
@@ -1752,6 +1753,9 @@ document.addEventListener('keydown',function(e){
 
 /* ── Reveal heart mosaic ── */
 function revealHeart(){
+  introContinued = true;
+  document.body.classList.remove('book-open');
+  document.body.style.overflow = '';
   const rev = document.getElementById('heartReveal');
   const msg = document.getElementById('heartMsg');
   const finalNote = document.getElementById('heartFinalNote');
@@ -1771,6 +1775,7 @@ function revealHeart(){
   setTimeout(()=>{
     rev.scrollIntoView({behavior:'smooth',block:'center'});
     autoScrollStopped = false;
+    toast.classList.remove('hidden');
     setTimeout(startAutoScroll, 2600);
   }, assembleDuration);
 }
