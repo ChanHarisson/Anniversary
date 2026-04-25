@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chan Nyein Han & Su Su Hlaing · Our First Anniversary</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@200;300;400;500&family=Noto+Sans+Myanmar:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black:      #0a0a0f;
+    --dark:       #111118;
+    --card-bg:    #16161f;
+    --pink:       #ff2d78;
+    --pink-soft:  #ff6fa3;
+    --pink-glow:  rgba(255, 45, 120, 0.18);
+    --pink-dim:   rgba(255, 45, 120, 0.08);
+    --white:      #f5f0f8;
+    --muted:      #7a7490;
+    --border:     rgba(255, 45, 120, 0.15);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden; /* safe on iOS — overflow-x on body breaks Safari scroll */
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--black);
+    color: var(--white);
+    cursor: default;
+    /* DO NOT put overflow-x:hidden here — kills iOS Safari scrolling */
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100; /* lowered — 9999 can interfere with iOS touch */
+    opacity: 0.5;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 4rem 2rem;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,45,120,0.22) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: pulseGlow 4s ease-in-out infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+    50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.08); }
+  }
+
+  .hero-grid-lines {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,45,120,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,45,120,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+  }
+
+  .hero-eyebrow {
+    font-size: 1rem;
+    font-weight: 300;
+    letter-spacing: 0.45em;
+    color: var(--pink);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.2s forwards;
+  }
+
+  .hero-names {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(2.2rem, 7vw, 5rem);
+    line-height: 0.95;
+    text-align: center;
+    color: var(--white);
+    opacity: 0;
+    animation: fadeUp 1s 0.5s forwards;
+    position: relative;
+  }
+
+  .hero-amp {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--pink);
+    display: block;
+    font-size: 0.55em;
+    line-height: 1.8;
+  }
+
+  .hero-divider {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin: 2.5rem 0;
+    opacity: 0;
+    animation: fadeUp 1s 0.8s forwards;
+  }
+
+  .hero-divider-line {
+    width: 80px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--pink), transparent);
+  }
+
+  .hero-date {
+    font-size: 0.78rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 1s 1s forwards;
+  }
+
+  /* ── COUNTDOWN ── */
+  .countdown-wrap {
+    display: flex;
+    gap: 0;
+    opacity: 0;
+    animation: fadeUp 1s 1.2s forwards;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    background: rgba(255,45,120,0.04);
+  }
+
+  .count-block {
+    text-align: center;
+    padding: 1.2rem 1.8rem;
+    position: relative;
+  }
+
+  .count-block + .count-block {
+    border-left: 1px solid var(--border);
+  }
+
+  .count-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--pink);
+    line-height: 1;
+    display: block;
+  }
+
+  .count-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: block;
+    margin-top: 6px;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    animation: fadeUp 1s 2.2s forwards;
+  }
+
+  .scroll-hint span {
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .scroll-arrow {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--pink), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  /* ── SECTIONS ── */
+  section { padding: 7rem 2rem; }
+
+  .section-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    color: var(--pink);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    text-align: center;
+    color: var(--white);
+    margin-bottom: 4rem;
+  }
+
+  /* ── HEART GALLERY ── */
+  .gallery-section {
+    background: var(--dark);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gallery-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 50%, var(--pink-dim) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /*
+   * HEART GALLERY — 13 big photos on a 5×6 grid
+   *
+   * Heart layout (5 cols × 6 rows):
+   *   Row 1: _ A _ B _    (two bumps)
+   *   Row 2: C D [E] F G  (full width, E is center tall)
+   *   Row 3: H I [E] J K  (E spans rows 2-3)
+   *   Row 4: _ L M N _    (narrowing)
+   *   Row 5: _ _ O _ _    (tip area)
+   *   Row 6: _ _ P _ _    (final tip)
+   *
+   * HOW TO ADD YOUR PHOTOS:
+   *   Replace <div class="photo-ph">...</div> with:
+   *   <img src="photos/your-photo.jpg" alt="caption" class="photo-img">
+   *   Put photos in a "photos/" folder next to this HTML file.
+   */
+
+  .heart-gallery {
+    max-width: 660px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 110px);
+    gap: 10px;
+  }
+
+  .photo-cell {
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.35s;
+    cursor: pointer;
+  }
+
+  .photo-cell:hover {
+    transform: scale(1.04);
+    z-index: 10;
+    box-shadow: 0 0 36px rgba(255, 45, 120, 0.5);
+  }
+
+  /* ── Heart positions — 5 cols × 5 rows ── */
+  /* Row 1 — two bumps */
+  .hA { grid-column: 2; grid-row: 1; }
+  .hB { grid-column: 4; grid-row: 1; }
+
+  /* Row 2 — full width */
+  .hC { grid-column: 1; grid-row: 2; }
+  .hD { grid-column: 2; grid-row: 2; }
+  .hE { grid-column: 3; grid-row: 2; }   /* was hero, now normal */
+  .hF { grid-column: 4; grid-row: 2; }
+  .hG { grid-column: 5; grid-row: 2; }
+
+  /* Row 3 — full width */
+  .hH { grid-column: 1; grid-row: 3; }
+  .hI { grid-column: 2; grid-row: 3; }
+  .hE2 { grid-column: 3; grid-row: 3; }  /* replaces bottom half of old hero */
+  .hJ { grid-column: 4; grid-row: 3; }
+  .hK { grid-column: 5; grid-row: 3; }
+
+  /* Row 4 — narrowing */
+  .hL { grid-column: 2; grid-row: 4; }
+  .hM { grid-column: 3; grid-row: 4; }
+  .hN { grid-column: 4; grid-row: 4; }
+
+  /* Row 5 — tip (single cell) */
+  .hO { grid-column: 3; grid-row: 5; }
+
+  .photo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Placeholder — replace with <img> when you have photos */
+  .photo-ph {
+    width: 100%;
+    height: 100%;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+
+  .photo-ph svg { opacity: 0.35; }
+
+  .photo-ph.hero-ph {
+    font-size: 0.8rem;
+    color: var(--pink-soft);
+    border-color: rgba(255,45,120,0.3);
+  }
+
+  /* Caption on hover */
+  .photo-caption {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 2rem 0.8rem 0.7rem;
+    background: linear-gradient(to top, rgba(10,10,15,0.88), transparent);
+    color: white;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    font-style: italic;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .photo-cell:hover .photo-caption { opacity: 1; }
+
+  /* ── LETTER ── */
+  .letter-section { background: var(--black); }
+
+  .letter-paper {
+    max-width: 620px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4rem;
+    position: relative;
+    box-shadow: 0 0 60px var(--pink-dim), inset 0 0 40px rgba(255,45,120,0.02);
+  }
+
+  .letter-paper::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--pink), transparent);
+  }
+
+  .letter-greeting {
+    font-family: 'Playfair Display', 'Noto Sans Myanmar', serif;
+    font-style: italic;
+    font-size: 1.6rem;
+    color: var(--pink-soft);
+    margin-bottom: 2rem;
+  }
+
+  .letter-body {
+    font-family: 'Playfair Display', 'Noto Sans Myanmar', serif;
+    font-size: 1rem;
+    line-height: 2;
+    color: rgba(245, 240, 248, 0.75);
+    font-weight: 300;
+  }
+
+  .letter-body p + p { margin-top: 1.2rem; }
+
+  .letter-sign {
+    font-family: 'Playfair Display', 'Noto Sans Myanmar', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--pink);
+    margin-top: 2.5rem;
+    text-align: right;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline-section { background: var(--dark); }
+
+  .timeline {
+    max-width: 680px;
+    margin: 0 auto;
+    position: relative;
+    padding: 1rem 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; left: 50%;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--pink), transparent);
+    transform: translateX(-50%);
+  }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 1fr 44px 1fr;
+    gap: 0;
+    margin-bottom: 3.5rem;
+    align-items: center;
+  }
+
+  .timeline-content { padding: 0 2rem; }
+  .timeline-item:nth-child(odd)  .timeline-content:first-child { text-align: right; }
+  .timeline-item:nth-child(odd)  .timeline-content:last-child  { opacity: 0; pointer-events: none; }
+  .timeline-item:nth-child(even) .timeline-content:first-child { opacity: 0; pointer-events: none; }
+
+  .timeline-dot {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--dark);
+    border: 1px solid var(--pink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 16px var(--pink-glow);
+  }
+
+  .timeline-dot-inner {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--pink);
+  }
+
+  .timeline-year {
+    font-size: 0.7rem;
+    color: var(--pink);
+    letter-spacing: 0.2em;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  .timeline-event {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--white);
+    font-weight: 400;
+    line-height: 1.3;
+  }
+
+  .timeline-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 5px;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ── CLOSING ── */
+  .closing-section {
+    background: var(--black);
+    text-align: center;
+    padding: 8rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .closing-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(255,45,120,0.14) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .closing-heart {
+    display: inline-block;
+    margin-bottom: 2.5rem;
+    animation: heartbeat 2.5s ease-in-out infinite;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    14%       { transform: scale(1.15); }
+    28%       { transform: scale(1); }
+    42%       { transform: scale(1.1); }
+    70%       { transform: scale(1); }
+  }
+
+  .closing-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    font-weight: 400;
+    color: var(--white);
+    max-width: 560px;
+    margin: 0 auto 1.5rem;
+    line-height: 1.6;
+    position: relative;
+  }
+
+  .closing-attr {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+
+  .closing-names {
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    color: rgba(255, 45, 120, 0.5);
+    text-transform: uppercase;
+    margin-top: 3rem;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; }
+    50%       { opacity: 1; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ── RESPONSIVE / iOS FIXES ── */
+  @media (max-width: 680px) {
+
+    section { padding: 4rem 1.2rem; }
+
+    /* Heart gallery */
+    .heart-gallery {
+      max-width: 340px;
+      grid-template-rows: repeat(5, 60px);
+      gap: 5px;
+    }
+    .photo-ph { font-size: 0; }
+    .photo-ph svg { display: none; }
+
+    /* Timeline — fully rebuilt for mobile */
+    .timeline::before { left: 18px; transform: none; }
+
+    .timeline-item {
+      display: block;
+      position: relative;
+      padding-left: 3.2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: 0; top: 4px;
+      width: 36px; height: 36px;
+    }
+
+    /* Hide all content divs first */
+    .timeline-content {
+      display: none !important;
+      padding: 0;
+      text-align: left !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    /* Only show the div that actually has content */
+    .timeline-content:has(.timeline-event) {
+      display: block !important;
+    }
+
+    /* Letter */
+    .letter-paper { padding: 2rem 1.2rem; }
+
+    /* Countdown */
+    .count-block { padding: 0.8rem 1rem; }
+    .count-number { font-size: 1.6rem; }
+
+    /* Hero */
+    .hero-names { font-size: clamp(2rem, 10vw, 3.5rem); }
+
+    /* Fix backdrop-filter on iOS Safari (causes blank sections) */
+    .countdown-wrap {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-grid-lines"></div>
+
+  <p class="hero-eyebrow">Our First Year Together</p>
+
+  <h1 class="hero-names">
+    Chan Nyein Han
+    <span class="hero-amp">&amp;</span>
+    Su Su Hlaing
+  </h1>
+
+  <div class="hero-divider">
+    <div class="hero-divider-line"></div>
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M10 17s-8-5.6-8-10a4 4 0 0 1 8 0 4 4 0 0 1 8 0c0 4.4-8 10-8 10z" fill="var(--pink)"/>
+    </svg>
+    <div class="hero-divider-line"></div>
+  </div>
+
+  <p class="hero-date">April 26, 2025 &nbsp;·&nbsp; One beautiful year</p>
+
+  <div class="countdown-wrap" id="countdown">
+    <div class="count-block">
+      <span class="count-number" id="cd-days">--</span>
+      <span class="count-label">Days</span>
+    </div>
+    <div class="count-block">
+      <span class="count-number" id="cd-hrs">--</span>
+      <span class="count-label">Hours</span>
+    </div>
+    <div class="count-block">
+      <span class="count-number" id="cd-min">--</span>
+      <span class="count-label">Min</span>
+    </div>
+    <div class="count-block">
+      <span class="count-number" id="cd-sec">--</span>
+      <span class="count-label">Sec</span>
+    </div>
+  </div>
+
+  <div class="scroll-hint" aria-hidden="true">
+    <span>Scroll</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ══ HEART GALLERY ══ -->
+<section class="gallery-section">
+  <p class="section-label reveal">Our Moments</p>
+  <h2 class="section-title reveal">A Year in Photographs</h2>
+
+  <!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  HOW TO ADD YOUR PHOTOS                                      ║
+  ║                                                              ║
+  ║  1. Create a folder called "photos" next to this HTML file   ║
+  ║  2. Put your images inside it (jpg, png, webp all work)      ║
+  ║  3. For each photo cell below, REPLACE the <div class="photo-ph">  ║
+  ║     block with:                                              ║
+  ║       <img src="photos/your-file.jpg" alt="caption" class="photo-img"> ║
+  ║                                                              ║
+  ║  Example:                                                    ║
+  ║    <!-- PHOTO 1 — REPLACE below div with your image 
+  ║    <div class="photo-cell p1">                               ║
+  ║      <img src="photos/beach.jpg" alt="Beach day" class="photo-img"> ║
+  ║      <div class="photo-caption">Beach day</div>              ║
+  ║    </div>                                                    ║
+  ║                                                              ║
+  ║  If hosting via DDNS: just keep all files in the same        ║
+  ║  folder — relative paths work perfectly!                     ║
+  ╚══════════════════════════════════════════════════════════════╝
+  --> 
+
+  <div class="heart-gallery reveal">
+
+    <!-- Row 1 — two bumps of the heart -->
+    <div class="photo-cell hA">
+      <img src="photos/first days.jpg" alt="First days" class="photo-img"> 
+      <div class="photo-caption">First days</div>
+    </div>
+    <div class="photo-cell hB">
+      <img src="photos/smile.jpg" alt="That smile" class="photo-img"> 
+      <div class="photo-caption">That smile</div>
+    </div>
+
+    <!-- Row 2 — full width -->
+    <div class="photo-cell hC">
+      <img src="photos/Sunshine.jpg" alt="Sunshine" class="photo-img"> 
+      <div class="photo-caption">Sunshine</div>
+    </div>
+    <div class="photo-cell hD">
+      <img src="photos/Birthday.jpg" alt="Birthday" class="photo-img"> 
+      <div class="photo-caption">Birthday with her</div>
+    </div>
+    <div class="photo-cell hE">
+      <img src="photos/us.jpg" alt="Us" class="photo-img"> 
+      <div class="photo-caption">Us ♡</div>
+    </div>
+    <div class="photo-cell hF">
+     <img src="photos/Night time.jpg" alt="Night out" class="photo-img"> 
+      <div class="photo-caption">Night out</div>
+    </div>
+    <div class="photo-cell hG">
+      <img src="photos/together.jpg" alt="Together" class="photo-img"> 
+      <div class="photo-caption">Together</div>
+    </div>
+
+    <!-- Row 3 — full width -->
+    <div class="photo-cell hH">
+      <img src="photos/Memories.jpg" alt="Memories" class="photo-img"> 
+      <div class="photo-caption">Memories</div>
+    </div>
+    <div class="photo-cell hI">
+      <img src="photos/Cozy Days.jpg" alt="Cozy days" class="photo-img"> 
+      <div class="photo-caption">Cozy days</div>
+    </div>
+    <div class="photo-cell hE2">
+      <img src="photos/favourite.jpg" alt="My Favourite" class="photo-img"> 
+      <div class="photo-caption">My favourite</div>
+    </div>
+    <div class="photo-cell hJ">
+      <img src="photos/Trip.jpg" alt="trip" class="photo-img"> 
+      <div class="photo-caption">Our first trip</div>
+    </div>
+    <div class="photo-cell hK">
+      <img src="photos/family.jpg" alt="family time" class="photo-img"> 
+      <div class="photo-caption">Family time</div>
+    </div>
+
+    <!-- Row 4 — narrowing -->
+    <div class="photo-cell hL">
+      <img src="photos/Just us.jpg" alt="Just us" class="photo-img"> 
+      <div class="photo-caption">Just us</div>
+    </div>
+    <div class="photo-cell hM">
+      <div class="photo-ph">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        photo 14
+      </div>
+      <div class="photo-caption">One year</div>
+    </div>
+    <div class="photo-cell hN">
+      <img src="photos/always.jpg" alt="Always" class="photo-img"> 
+      <div class="photo-caption">Always</div>
+    </div>
+
+    <!-- Row 5 — tip of heart -->
+    <div class="photo-cell hO">
+      <img src="photos/heart.jpg" alt="First days" class="photo-img"> >
+      <div class="photo-caption">♡</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ LOVE LETTER ══ -->
+<section class="letter-section">
+  <p class="section-label reveal">Written for you</p>
+  <h2 class="section-title reveal">A Letter</h2>
+
+  <div class="letter-paper reveal">
+    <p class="letter-greeting">ချစ်လေး,</p>
+    <div class="letter-body">
+      <p>A year ago, I could not have imagined what saying yes to you would begin. It has meant laughing until 2am, finding a hand that feels like home, and discovering a warmth I did not know I was missing.</p>
+      <p>Every ordinary day with you has felt like something I want to hold onto — morning coffee, late nights, the small things only we know. In all of it, you have been steady, and bright, and entirely yourself.</p>
+      <p>Thank you for choosing me. For your patience and your warmth and the way everything feels lighter when I'm with you. I am so proud that you are mine.</p>
+      <p>Here is to every year ahead — may they all feel as full as this first one has.</p>
+    </div>
+    <p class="letter-sign">All my love, always ♡</p>
+  </div>
+</section>
+
+<!-- ══ TIMELINE ══ -->
+<section class="timeline-section">
+  <p class="section-label reveal">How we got here</p>
+  <h2 class="section-title reveal">Our Story</h2>
+
+  <div class="timeline">
+
+    <div class="timeline-item reveal">
+      <div class="timeline-content">
+        <p class="timeline-year">The beginning</p>
+        <p class="timeline-event">The first hello</p>
+        <p class="timeline-desc">A coincidence that changed everything.</p>
+      </div>
+      <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+      <div class="timeline-content"></div>
+    </div>
+
+    <div class="timeline-item reveal">
+      <div class="timeline-content"></div>
+      <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+      <div class="timeline-content">
+        <p class="timeline-year">First date</p>
+        <p class="timeline-event">Just the two of us</p>
+        <p class="timeline-desc">Nervous, hopeful, and completely worth it.</p>
+      </div>
+    </div>
+
+    <div class="timeline-item reveal">
+      <div class="timeline-content">
+        <p class="timeline-year">Making it official</p>
+        <p class="timeline-event">We chose each other</p>
+        <p class="timeline-desc">The best decision I ever made.</p>
+      </div>
+      <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+      <div class="timeline-content"></div>
+    </div>
+
+    <div class="timeline-item reveal">
+      <div class="timeline-content"></div>
+      <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+      <div class="timeline-content">
+        <p class="timeline-year">Our adventures</p>
+        <p class="timeline-event">Exploring together</p>
+        <p class="timeline-desc">Every new place better because you were there.</p>
+      </div>
+    </div>
+
+    <div class="timeline-item reveal">
+      <div class="timeline-content">
+        <p class="timeline-year">One year ♡</p>
+        <p class="timeline-event">April 26, 2025</p>
+        <p class="timeline-desc">The first of many. Here's to us.</p>
+      </div>
+      <div class="timeline-dot" style="box-shadow: 0 0 28px rgba(255,45,120,0.6);">
+        <div class="timeline-dot-inner"></div>
+      </div>
+      <div class="timeline-content"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ CLOSING ══ -->
+<section class="closing-section">
+  <div class="closing-heart" aria-hidden="true">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+      <path d="M26 45s-19-11.5-19-22A9.5 9.5 0 0 1 26 17.3 9.5 9.5 0 0 1 45 23c0 10.5-19 22-19 22z" fill="var(--pink)" opacity="0.9"/>
+    </svg>
+  </div>
+  <p class="closing-quote reveal">"I have found the one whom my soul loves."</p>
+  <p class="closing-attr reveal">Song of Solomon 3:4</p>
+  <p class="closing-names reveal">Chan &amp; Su &nbsp;·&nbsp; April 26, 2025</p>
+</section>
+
+<script>
+  // ── Countdown — counts UP from your anniversary date ──
+  (function () {
+    // ← Change this to your actual anniversary date
+    const anniversaryDate = new Date('2025-04-26T00:00:00');
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function tick() {
+      const diff = Math.max(0, Date.now() - anniversaryDate);
+      const totalSec = Math.floor(diff / 1000);
+      const days = Math.floor(totalSec / 86400);
+      const hrs  = Math.floor((totalSec % 86400) / 3600);
+      const min  = Math.floor((totalSec % 3600) / 60);
+      const sec  = totalSec % 60;
+
+      document.getElementById('cd-days').textContent = pad(days);
+      document.getElementById('cd-hrs').textContent  = pad(hrs);
+      document.getElementById('cd-min').textContent  = pad(min);
+      document.getElementById('cd-sec').textContent  = pad(sec);
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  })();
+
+  // ── Scroll reveal ──
+  (function () {
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  })();
+</script>
+</body>
+</html>
