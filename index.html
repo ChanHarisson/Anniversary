@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chan Nyein Han & Su Su Hlaing · Our First Anniversary</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@200;300;400;500&family=Noto+Sans+Myanmar:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black:     #0a0a0f;
+  --dark:      #111118;
+  --card-bg:   #16161f;
+  --pink:      #ff2d78;
+  --pink-soft: #ff6fa3;
+  --pink-glow: rgba(255,45,120,0.18);
+  --pink-dim:  rgba(255,45,120,0.08);
+  --white:     #f5f0f8;
+  --muted:     #7a7490;
+  --border:    rgba(255,45,120,0.15);
+}
+
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body { font-family: 'DM Sans', sans-serif; background: var(--black); color: var(--white); cursor: default; }
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 100; opacity: 0.5;
+}
+
+/* ══ SCROLL PROGRESS ══ */
+.scroll-bar {
+  position: fixed; top: 0; left: 0; height: 2px; z-index: 300;
+  background: linear-gradient(90deg, var(--pink), #c91060);
+  width: 0%; box-shadow: 0 0 8px var(--pink);
+  transition: width 0.05s linear;
+}
+
+/* ══ MUSIC PLAYER ══ */
+.music-player {
+  position: fixed; bottom: 1.4rem; left: 1.4rem; z-index: 500;
+  display: flex; align-items: center; gap: .75rem;
+  background: rgba(10,10,15,0.82);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: .55rem .55rem .55rem .9rem;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,45,120,0.06);
+  transition: opacity .3s, transform .3s;
+  max-width: calc(100vw - 2.8rem);
+}
+.music-player.hidden { opacity:0; pointer-events:none; transform:translateY(8px); }
+
+.music-info {
+  display: flex; flex-direction: column; gap: 1px;
+  overflow: hidden; max-width: 130px;
+}
+.music-title {
+  font-size: .68rem; font-weight: 500; color: var(--white);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  letter-spacing: .03em;
+}
+.music-sub {
+  font-size: .58rem; color: var(--muted); letter-spacing: .06em;
+}
+
+/* animated bars */
+.music-bars {
+  display: flex; align-items: flex-end; gap: 2px;
+  height: 16px; flex-shrink: 0;
+}
+.music-bars span {
+  width: 3px; border-radius: 2px;
+  background: var(--pink);
+  animation: barBounce .8s ease-in-out infinite alternate;
+  transform-origin: bottom;
+}
+.music-bars span:nth-child(1){ height:6px;  animation-delay:0s;    }
+.music-bars span:nth-child(2){ height:12px; animation-delay:.15s;  }
+.music-bars span:nth-child(3){ height:8px;  animation-delay:.3s;   }
+.music-bars span:nth-child(4){ height:14px; animation-delay:.1s;   }
+.music-bars span:nth-child(5){ height:5px;  animation-delay:.25s;  }
+.music-bars.paused span { animation-play-state: paused; }
+@keyframes barBounce {
+  from { transform: scaleY(.3); opacity:.5; }
+  to   { transform: scaleY(1);  opacity:1;  }
+}
+
+.music-btn {
+  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--pink), #c91060);
+  border: none; cursor: pointer; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem;
+  transition: transform .2s, box-shadow .2s;
+  box-shadow: 0 0 12px rgba(255,45,120,0.4);
+  -webkit-tap-highlight-color: transparent;
+}
+.music-btn:hover { transform: scale(1.1); box-shadow: 0 0 22px rgba(255,45,120,0.65); }
+.music-btn:active { transform: scale(.95); }
+
+.music-volume {
+  -webkit-appearance: none; appearance: none;
+  width: 56px; height: 3px; border-radius: 2px; flex-shrink: 0;
+  background: linear-gradient(90deg, var(--pink) var(--vol,60%), rgba(255,45,120,.2) var(--vol,60%));
+  outline: none; cursor: pointer; border: none;
+}
+.music-volume::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 12px; height: 12px;
+  border-radius: 50%; background: var(--pink);
+  box-shadow: 0 0 6px rgba(255,45,120,0.6);
+}
+.music-volume::-moz-range-thumb {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--pink); border: none;
+}
+
+/* hide volume on very small screens */
+@media(max-width:360px){ .music-volume{ display:none; } }
+
+/* ══ HERO ══ */
+.hero {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  position: relative; padding: 4rem 2rem 6rem; overflow: hidden;
+  isolation: isolate;
+}
+
+.hero-glow {
+  position: absolute; width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,45,120,0.22) 0%, transparent 70%);
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  pointer-events: none; animation: pulseGlow 4s ease-in-out infinite;
+}
+@keyframes pulseGlow {
+  0%,100% { opacity:.8; transform:translate(-50%,-50%) scale(1); }
+  50%      { opacity:1;  transform:translate(-50%,-50%) scale(1.08); }
+}
+
+.hero-grid-lines {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,45,120,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,45,120,0.04) 1px, transparent 1px);
+  background-size: 60px 60px; pointer-events: none;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+}
+
+/* floating petals */
+.petal {
+  position: absolute; pointer-events: none;
+  font-size: 1rem; opacity: 0;
+  animation: petalFall linear infinite;
+}
+@keyframes petalFall {
+  0%   { opacity:0; transform: translateY(-20px) rotate(0deg); }
+  10%  { opacity:.7; }
+  90%  { opacity:.3; }
+  100% { opacity:0; transform: translateY(100vh) rotate(360deg); }
+}
+
+.hero-eyebrow {
+  font-size: 1rem; font-weight: 300; letter-spacing: 0.45em;
+  color: var(--pink); text-transform: uppercase; margin-bottom: 2rem;
+  opacity: 0; animation: fadeSoft 1.6s 0.25s cubic-bezier(.18,.82,.22,1) forwards;
+}
+.hero-names {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: clamp(2.2rem,7vw,5rem); line-height: 0.95; color: var(--white);
+  opacity: 1;
+  text-wrap: balance;
+}
+.name-line {
+  display: block;
+  opacity: 0;
+  transform: translateY(34px) scale(.96);
+  filter: blur(8px);
+  animation: nameReveal 1.9s cubic-bezier(.16,.82,.2,1) forwards;
+}
+.name-line:first-child { animation-delay: .75s; }
+.name-line:last-child { animation-delay: 1.85s; }
+.hero-amp {
+  font-style:italic; font-weight:400; color:var(--pink); display:block; font-size:0.55em; line-height:1.8;
+  opacity: 0;
+  transform: scale(.6) rotate(-8deg);
+  filter: drop-shadow(0 0 0 rgba(255,45,120,0));
+  animation: ampBloom 1.35s cubic-bezier(.22,1,.28,1) 1.35s forwards;
+}
+
+.hero-divider {
+  display: flex; align-items: center; justify-content: center;
+  gap: 1.2rem; margin: 2.5rem auto;
+  opacity: 0; animation: fadeSoft 1.4s 2.5s cubic-bezier(.18,.82,.22,1) forwards;
+}
+.hero-divider-line { width:80px; height:1px; background:linear-gradient(90deg,transparent,var(--pink),transparent); }
+
+.hero-date {
+  font-size:.78rem; font-weight:300; letter-spacing:.2em; color:var(--muted);
+  margin-bottom:3rem; text-transform:uppercase;
+  opacity:0; animation:fadeSoft 1.4s 2.8s cubic-bezier(.18,.82,.22,1) forwards;
+}
+
+.countdown-wrap {
+  display: inline-flex; gap: 0;
+  opacity:0; animation:fadeSoft 1.4s 3.1s cubic-bezier(.18,.82,.22,1) forwards;
+  border:1px solid var(--border); border-radius:4px;
+  overflow:hidden; background:rgba(255,45,120,0.04);
+}
+.count-block { text-align:center; padding:1.2rem 1.8rem; position:relative; }
+.count-block+.count-block { border-left:1px solid var(--border); }
+.count-number { font-family:'Playfair Display',serif; font-size:2.5rem; font-weight:700; color:var(--pink); line-height:1; display:block; }
+.count-label  { font-size:.55rem; letter-spacing:.25em; color:var(--muted); text-transform:uppercase; display:block; margin-top:6px; }
+
+.hero-continue {
+  position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%);
+  display:inline-flex; align-items:center; justify-content:center; gap:.65rem;
+  min-height:42px; padding:.75rem 1.15rem;
+  border:1px solid rgba(255,45,120,.35); border-radius:999px;
+  background:rgba(255,45,120,.08); color:var(--white);
+  font-size:.62rem; letter-spacing:.24em; text-transform:uppercase;
+  cursor:pointer; opacity:0; animation:continueReveal 1.4s 3.7s cubic-bezier(.18,.82,.22,1) forwards;
+  box-shadow:0 0 24px rgba(255,45,120,.12);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .35s ease, border-color .35s ease, background .35s ease, box-shadow .35s ease;
+}
+.hero-continue:hover { border-color:var(--pink); background:rgba(255,45,120,.14); box-shadow:0 0 32px rgba(255,45,120,.22); }
+.hero-continue:active { transform:translateX(-50%) scale(.96); }
+.continue-mark {
+  width:18px; height:18px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,var(--pink),#c91060);
+  color:#fff; letter-spacing:0; font-size:.72rem; line-height:1;
+}
+
+/* ══ SECTIONS ══ */
+section { min-height:100vh; min-height:100svh; padding:7rem 2rem; }
+.section-label { font-size:.6rem; letter-spacing:.4em; color:var(--pink); text-transform:uppercase; text-align:center; margin-bottom:1rem; }
+.section-title { font-family:'Playfair Display',serif; font-weight:400; font-style:italic; font-size:clamp(2rem,5vw,3.2rem); text-align:center; color:var(--white); margin-bottom:4rem; }
+
+/* ══ GALLERY ══ */
+.gallery-section {
+  background:var(--dark); position:relative; overflow:hidden;
+  display:flex; flex-direction:column; justify-content:center;
+}
+.gallery-section::before { content:\'\'; position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 50%,var(--pink-dim) 0%,transparent 70%); pointer-events:none; }
+.gallery-section > * { position:relative; z-index:1; }
+.gallery-section.gallery-entering .section-label,
+.gallery-section.gallery-entering .section-title,
+.gallery-section.gallery-entering .book-trigger {
+  animation: gallerySettle 1.25s cubic-bezier(.18,.82,.22,1) both;
+}
+.gallery-section.gallery-entering .section-title { animation-delay:.12s; }
+.gallery-section.gallery-entering .book-trigger { animation-delay:.28s; }
+@keyframes gallerySettle {
+  from { opacity:0; transform:translateY(32px) scale(.98); filter:blur(10px); }
+  to { opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+}
+
+/* ── Book cover trigger ── */
+.book-trigger {
+  display:flex; flex-direction:column; align-items:center; gap:2rem;
+  cursor:pointer; padding:1rem;
+}
+.book-trigger.hidden { display:none; }
+
+.book-scene {
+  perspective: 1000px;
+  width:180px; height:230px;
+}
+
+.book-3d {
+  width:100%; height:100%;
+  position:relative;
+  transform-style:preserve-3d;
+  transition:transform 0.6s cubic-bezier(0.23,1,0.32,1);
+  transform:rotateY(-18deg) rotateX(6deg);
+}
+.book-trigger:hover .book-3d { transform:rotateY(-28deg) rotateX(10deg) scale(1.06); }
+
+.book-face {
+  position:absolute; width:100%; height:100%;
+  backface-visibility:hidden; border-radius:4px 18px 18px 4px;
+  background:linear-gradient(145deg,#3d0a1e,#6b1035,#3d0a1e);
+  border:1px solid rgba(255,45,120,0.3);
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:12px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.8), 0 0 40px var(--pink-glow);
+  overflow:hidden;
+}
+.book-face::before {
+  content:\'\'; position:absolute; left:0; top:0; bottom:0;
+  width:22px; background:linear-gradient(90deg,rgba(0,0,0,0.55),rgba(255,45,120,0.15),transparent);
+  border-right:1px solid rgba(255,45,120,0.2);
+}
+.book-face::after {
+  content:\'\'; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,transparent 50%,rgba(0,0,0,0.2) 100%);
+}
+.book-spine {
+  position:absolute; right:-16px; top:2px; bottom:2px;
+  width:16px; border-radius:0 4px 4px 0;
+  background:linear-gradient(90deg,#2a0510,#4a0e1f);
+  border:1px solid rgba(255,45,120,0.15); border-left:none;
+}
+.book-title { font-family:\'Playfair Display\',serif; font-style:italic; font-size:.95rem; color:var(--pink-soft); letter-spacing:.15em; position:relative; z-index:1; text-align:center; }
+.book-icon  { position:relative; z-index:1; animation:heartbeat 2.5s ease-in-out infinite; }
+.book-cta { font-size:.72rem; letter-spacing:.25em; color:var(--muted); text-transform:uppercase; animation:pulseText 2s ease-in-out infinite; }
+@keyframes pulseText { 0%,100%{opacity:.4;} 50%{opacity:1;} }
+
+/* ════════════════════════════════════════════
+   BOOK READER — full-screen book opening animation
+   The book expands to fill screen, pages flip with photos
+════════════════════════════════════════════ */
+.book-reader {
+  position: fixed; inset: 0; z-index: 2000;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: clamp(1rem, 4vw, 2.4rem);
+  background: rgba(5,5,10,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  overflow: hidden;
+}
+.book-reader.active { display: flex; }
+body.book-open { overflow: hidden; }
+
+/* The open book container */
+.open-book {
+  position: relative;
+  width: min(calc(100vw - 3rem), 1180px);
+  height: min(calc(100svh - 7rem), 720px);
+  min-height: min(560px, calc(100svh - 7rem));
+  transform-style: preserve-3d;
+  perspective: 2000px;
+  filter: drop-shadow(0 34px 70px rgba(0,0,0,.72));
+}
+.open-book::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 50%;
+  z-index: 30;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  border-radius: 0 16px 16px 0;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.45), transparent 16%),
+    linear-gradient(145deg,#3d0a1e,#77113a 48%,#2a0510);
+  border: 1px solid rgba(255,45,120,.28);
+  box-shadow: 24px 0 60px rgba(0,0,0,.62), inset 18px 0 28px rgba(0,0,0,.38);
+  opacity: 0;
+}
+
+/* Spine divider in centre */
+.book-spine-center {
+  position: absolute; top: 0; bottom: 0;
+  left: 50%; width: 6px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #2a0510, #6b1035, #2a0510);
+  border-left:  1px solid rgba(255,45,120,0.25);
+  border-right: 1px solid rgba(255,45,120,0.25);
+  z-index: 10;
+  box-shadow: 0 0 18px rgba(255,45,120,0.15);
+}
+
+/* Left page (static — shows caption / info) */
+.book-page-left {
+  position: absolute; top: 0; bottom: 0; left: 0; right: 50%;
+  background:
+    linear-gradient(90deg, transparent, rgba(255,255,255,.025) 60%, transparent),
+    linear-gradient(135deg, #1a0a12, #1e0d16);
+  border-radius: 8px 0 0 8px;
+  border: 1px solid rgba(255,45,120,0.12);
+  border-right: none;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 2.5rem 2rem;
+  box-shadow: inset -20px 0 40px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+.book-page-left::after {
+  content: \'\';
+  position: absolute; top: 0; right: 0; bottom: 0; width: 30px;
+  background: linear-gradient(to left, rgba(0,0,0,0.35), transparent);
+  pointer-events: none;
+}
+
+.left-page-number {
+  position: absolute; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
+  font-size: .6rem; letter-spacing: .3em; color: rgba(255,45,120,0.4);
+  text-transform: uppercase;
+}
+.left-page-quote {
+  font-family: \'Playfair Display\', serif;
+  font-style: italic; font-size: clamp(.85rem, 2.2vw, 1.1rem);
+  color: rgba(245,240,248,.55); text-align: center; line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+.left-page-caption {
+  font-family: \'Playfair Display\', serif;
+  font-style: italic; font-size: clamp(1rem, 2.8vw, 1.4rem);
+  color: var(--pink-soft); text-align: center; line-height: 1.5;
+}
+.left-page-divider {
+  width: 40px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--pink), transparent);
+  margin: 1rem auto;
+}
+.left-page-counter {
+  font-size: .58rem; letter-spacing: .3em; color: var(--muted);
+  text-transform: uppercase; text-align: center;
+}
+
+/* Right page — the turning page with photo */
+.book-page-right-wrap {
+  position: absolute; top: 0; bottom: 0; left: 50%; right: 0;
+  perspective: 1800px;
+  transform-style: preserve-3d;
+}
+
+.book-page-right {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  transition: transform 1.35s cubic-bezier(.18,.74,.2,1);
+  transform: rotateY(0deg);
+  z-index: 4;
+}
+.book-page-right.no-transition {
+  transition: none;
+}
+
+/* Front of right page — photo */
+.page-front {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  background: #0d0610;
+  border-radius: 0 8px 8px 0;
+  border: 1px solid rgba(255,45,120,0.12);
+  border-left: none;
+  overflow: hidden;
+  box-shadow: 20px 0 60px rgba(0,0,0,0.6), inset 20px 0 40px rgba(0,0,0,0.3);
+}
+.page-front img,
+.page-back img,
+.book-next-page img {
+  width: 100%; height: 100%;
+  object-fit: contain; display: block;
+  position: relative; z-index: 2;
+  filter: brightness(0.96) contrast(1.03);
+}
+.page-photo-bg {
+  position: absolute; inset: -22px;
+  background-position: center;
+  background-size: cover;
+  filter: blur(18px) brightness(.42) saturate(1.15);
+  transform: scale(1.08);
+  z-index: 1;
+}
+.page-front-ph {
+  width:100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px; color:var(--muted); font-size:.8rem; letter-spacing:.08em;
+}
+/* shadow overlay to sell the curl */
+.page-front::after {
+  content: \'\';
+  position: absolute; inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.35) 0%, transparent 30%);
+  pointer-events: none;
+}
+
+/* Back of right page — revealed when flipping */
+.page-back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.32), transparent 26%),
+    linear-gradient(135deg, #170b13, #24101b);
+  border-radius: 0 8px 8px 0;
+  border: 1px solid rgba(255,45,120,0.1);
+  border-left: none;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  box-shadow: inset -18px 0 36px rgba(0,0,0,.34);
+}
+.page-back::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, rgba(255,255,255,.05), transparent 45%, rgba(0,0,0,.22));
+  pointer-events: none;
+}
+.book-next-page {
+  position: absolute; inset: 0;
+  z-index: 1;
+  border-radius: 0 8px 8px 0;
+  border: 1px solid rgba(255,45,120,0.1);
+  border-left: none;
+  overflow: hidden;
+  background: #0d0610;
+  box-shadow: inset 20px 0 38px rgba(0,0,0,.3);
+}
+.book-next-page:empty {
+  display: none;
+}
+
+/* The turning animation class */
+.book-page-right.flipped { transform: rotateY(-180deg); }
+
+/* Entry animation — book opens from cover */
+@keyframes bookOpen {
+  0%   { opacity:0; transform: scale(0.34) rotateY(-34deg) rotateX(10deg); }
+  45%  { opacity:1; transform: scale(.92) rotateY(-8deg) rotateX(3deg); }
+  100% { opacity:1; transform: scale(1) rotateY(0deg) rotateX(0deg); }
+}
+.open-book.entering { animation: bookOpen 1.65s cubic-bezier(.18,.82,.22,1) forwards; }
+.open-book.entering::before {
+  opacity: 1;
+  animation: coverOpen 1.9s cubic-bezier(.16,.78,.2,1) forwards;
+}
+@keyframes coverOpen {
+  0%   { transform: rotateY(0deg); opacity: 1; }
+  68%  { transform: rotateY(-162deg); opacity: 1; }
+  100% { transform: rotateY(-184deg); opacity: 0; }
+}
+
+/* Exit animation */
+@keyframes bookClose {
+  0%   { opacity:1; transform: scale(1); clip-path: inset(0 round 8px); }
+  62%  { opacity:1; transform: scale(.48) rotateY(16deg) rotateX(-5deg); clip-path: inset(0 round 16px); }
+  100% { opacity:0; transform: scale(.16) rotateY(20deg) rotateX(-8deg); clip-path: path('M50% 90% C16% 68% 4% 45% 13% 25% C20% 10% 38% 9% 50% 24% C62% 9% 80% 10% 87% 25% C96% 45% 84% 68% 50% 90%'); }
+}
+.open-book.closing { animation: bookClose 1.15s cubic-bezier(.7,0,.18,1) forwards; }
+.open-book.closing.revealing-heart { animation-duration: 1.55s; }
+
+.heart-burst {
+  position: absolute; left: 50%; top: 50%;
+  width: min(44vw, 280px); aspect-ratio: 1;
+  transform: translate(-50%,-50%) scale(.08);
+  opacity: 0; pointer-events: none; z-index: 40;
+  background: var(--pink);
+  clip-path: path('M50% 90% C16% 68% 4% 45% 13% 25% C20% 10% 38% 9% 50% 24% C62% 9% 80% 10% 87% 25% C96% 45% 84% 68% 50% 90%');
+  filter: drop-shadow(0 0 28px rgba(255,45,120,.72));
+}
+.heart-burst.active { animation: heartBurst 1.55s cubic-bezier(.2,.9,.24,1) forwards; }
+@keyframes heartBurst {
+  0% { opacity: 0; transform: translate(-50%,-50%) scale(.08) rotate(-8deg); }
+  45% { opacity: .95; transform: translate(-50%,-50%) scale(.86) rotate(0deg); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(1.35) rotate(0deg); }
+}
+
+/* Page turn shadow effect */
+.page-curl-shadow {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 30px;
+  background: linear-gradient(to right, rgba(0,0,0,0.5), transparent);
+  pointer-events: none; z-index: 5;
+  transition: opacity .8s ease;
+}
+
+/* Nav buttons */
+.book-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(255,45,120,0.1); border: 1px solid var(--border);
+  color: var(--pink); width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 1rem; z-index: 20;
+  transition: background .2s, transform .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.book-nav:hover { background: rgba(255,45,120,0.25); transform: translateY(-50%) scale(1.1); }
+.book-nav-prev { left: -56px; }
+.book-nav-next { right: -56px; }
+
+/* Close button */
+.book-close {
+  position: absolute; top: -52px; right: 0;
+  background: none; border: 1px solid var(--border);
+  color: var(--muted); width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 1rem; z-index: 20;
+  transition: border-color .2s, color .2s;
+}
+.book-close:hover { border-color: var(--pink); color: var(--pink); }
+
+/* Progress dots row */
+.book-dots {
+  position: absolute; bottom: -44px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; z-index: 20;
+}
+.book-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(255,45,120,0.25);
+  transition: background .3s, transform .3s;
+}
+.book-dot.active { background: var(--pink); transform: scale(1.5); }
+
+/* Skip text */
+.book-skip {
+  position: absolute; bottom: -44px; right: 0;
+  font-size: .58rem; letter-spacing: .25em; color: var(--muted);
+  text-transform: uppercase; cursor: pointer; z-index: 20;
+  transition: color .2s;
+}
+.book-skip:hover { color: var(--pink); }
+
+/* Mobile — stack pages vertically */
+@media(max-width:600px){
+  .book-reader { align-items:center; padding:4.8rem .75rem 4.2rem; }
+  .open-book { width:calc(100vw - 1.5rem); height:calc(100svh - 9rem); min-height:0; }
+  .open-book::before { inset:0; border-radius:14px; }
+  .book-page-left {
+    display:flex; left:0; right:0; top:0; bottom:auto; height:32%;
+    border-radius:14px 14px 0 0; border-right:1px solid rgba(255,45,120,0.12);
+    padding:1.2rem 1rem; box-shadow: inset 0 -18px 34px rgba(0,0,0,.3);
+  }
+  .book-page-left::after { inset:auto 0 0 0; width:auto; height:24px; background:linear-gradient(to top, rgba(0,0,0,.38), transparent); }
+  .left-page-quote { font-size:.84rem; line-height:1.45; margin-bottom:.55rem; }
+  .left-page-divider { margin:.45rem auto; }
+  .left-page-caption { font-size:1rem; }
+  .left-page-counter { font-size:.52rem; letter-spacing:.18em; }
+  .left-page-number { display:none; }
+  .book-page-right-wrap { position:absolute; left:0; right:0; top:32%; bottom:0; width:100%; height:auto; }
+  .book-page-right { border-radius:10px; }
+  .page-front, .page-back { border-radius:0 0 14px 14px; border:1px solid rgba(255,45,120,0.12); }
+  .book-spine-center { display:none; }
+  .book-nav { top:auto; bottom:-3.4rem; width:42px; height:42px; background:rgba(255,45,120,.16); }
+  .book-nav-prev { left:0; }
+  .book-nav-next { right:0; }
+  .book-close { top:-3.8rem; right:0; }
+  .book-dots { bottom:-2.4rem; max-width:48vw; flex-wrap:wrap; justify-content:center; }
+  .book-skip { bottom:-3.35rem; left:50%; right:auto; transform:translateX(-50%); white-space:nowrap; }
+}
+
+/* ── HEART GALLERY (final) ── */
+.heart-gallery-reveal { display:none; }
+.heart-gallery-reveal.active {
+  min-height: calc(100svh - 8rem);
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(1.5rem, 4vw, 3rem) 0;
+}
+
+.gallery-section.heart-mode {
+  justify-content:center;
+  padding-top:4rem;
+  padding-bottom:4rem;
+}
+.gallery-section.heart-mode > .section-label,
+.gallery-section.heart-mode > .section-title,
+.gallery-section.heart-mode > .book-trigger {
+  display:none;
+}
+
+.heart-reveal-msg {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  max-width:760px;
+  margin:0 auto clamp(1.4rem, 3vw, 2.4rem);
+  opacity:0;
+  transform:translateY(16px);
+  transition:opacity .8s, transform .8s;
+}
+.heart-reveal-msg.visible { opacity:1; transform:none; }
+.heart-reveal-msg p { font-family:'Playfair Display',serif; font-style:italic; font-size:clamp(1.65rem,4.5vw,3rem); color:var(--pink-soft); line-height:1.25; }
+.heart-reveal-msg p { order:2; }
+.heart-kicker {
+  order:1;
+  display:block;
+  margin-bottom:.8rem;
+  font-size:.62rem;
+  letter-spacing:.34em;
+  text-transform:uppercase;
+  color:var(--pink);
+  font-style:normal;
+  font-family:'DM Sans',sans-serif;
+}
+.heart-subcopy {
+  order:3;
+  max-width:620px;
+  margin:.95rem auto 0;
+  color:rgba(245,240,248,.68);
+  font-size:clamp(.9rem, 2vw, 1.08rem);
+  line-height:1.8;
+  font-family:'DM Sans',sans-serif;
+  font-style:normal;
+  letter-spacing:0;
+}
+.heart-final-note {
+  max-width:720px;
+  margin:clamp(1.4rem, 3vw, 2.4rem) auto 0;
+  text-align:center;
+  color:rgba(245,240,248,.74);
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.05rem, 2.4vw, 1.5rem);
+  font-style:italic;
+  line-height:1.6;
+  opacity:0;
+  transform:translateY(16px);
+  transition:opacity .8s .45s, transform .8s .45s;
+}
+.heart-final-note.visible { opacity:1; transform:none; }
+.heart-signoff {
+  display:block;
+  margin-top:.65rem;
+  color:var(--pink-soft);
+  font-family:'DM Sans',sans-serif;
+  font-size:.62rem;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  font-style:normal;
+}
+
+.heart-gallery {
+  width:min(88vw, 880px); margin:0 auto;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  grid-template-rows:repeat(5, minmax(86px, 1fr));
+  gap:12px;
+}
+
+.photo-cell {
+  border-radius:10px; overflow:hidden; position:relative;
+  transition:transform .35s cubic-bezier(.25,.46,.45,.94), box-shadow .35s;
+  cursor:pointer; opacity:0;
+}
+.photo-cell.pop { animation:cellPop 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+@keyframes cellPop {
+  from { opacity:0; transform:scale(0.4) rotate(var(--rot,0deg)); }
+  to   { opacity:1; transform:scale(1) rotate(0deg); }
+}
+.photo-cell:hover { transform:scale(1.06); z-index:10; box-shadow:0 0 36px rgba(255,45,120,0.5); }
+
+.hA{grid-column:2;grid-row:1;} .hB{grid-column:4;grid-row:1;}
+.hC{grid-column:1;grid-row:2;} .hD{grid-column:2;grid-row:2;} .hE{grid-column:3;grid-row:2;} .hF{grid-column:4;grid-row:2;} .hG{grid-column:5;grid-row:2;}
+.hH{grid-column:1;grid-row:3;} .hI{grid-column:2;grid-row:3;} .hE2{grid-column:3;grid-row:3;} .hJ{grid-column:4;grid-row:3;} .hK{grid-column:5;grid-row:3;}
+.hL{grid-column:2;grid-row:4;} .hM{grid-column:3;grid-row:4;} .hN{grid-column:4;grid-row:4;}
+.hO{grid-column:3;grid-row:5;}
+
+.photo-img { width:100%; height:100%; object-fit:cover; display:block; }
+.photo-ph { width:100%; height:100%; background:var(--card-bg); border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--muted); font-size:.7rem; letter-spacing:.08em; text-align:center; }
+.photo-ph svg { opacity:.35; }
+.photo-caption { position:absolute; bottom:0; left:0; right:0; padding:2rem .8rem .8rem; background:linear-gradient(to top,rgba(10,10,15,.88),transparent); color:white; font-size:clamp(.82rem,1.8vw,1.05rem); letter-spacing:.04em; font-style:italic; opacity:0; transition:opacity .3s; pointer-events:none; font-family:'Playfair Display',serif; }
+.photo-cell:hover .photo-caption { opacity:1; }
+
+/* ══ LETTER ══ */
+.letter-section { background:var(--black); }
+.letter-paper { max-width:620px; margin:0 auto; background:var(--card-bg); border:1px solid var(--border); border-radius:6px; padding:4rem; position:relative; box-shadow:0 0 60px var(--pink-dim), inset 0 0 40px rgba(255,45,120,.02); }
+.letter-paper::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--pink),transparent); }
+.letter-greeting { font-family:'Playfair Display','Noto Sans Myanmar',serif; font-style:italic; font-size:1.6rem; color:var(--pink-soft); margin-bottom:2rem; }
+.letter-body { font-family:'Playfair Display','Noto Sans Myanmar',serif; font-size:1rem; line-height:2; color:rgba(245,240,248,.75); font-weight:300; }
+.letter-body p+p { margin-top:1.2rem; }
+.letter-sign { font-family:'Playfair Display','Noto Sans Myanmar',serif; font-style:italic; font-size:1.15rem; color:var(--pink); margin-top:2.5rem; text-align:right; }
+
+/* ══ TIMELINE ══ */
+.timeline-section { background:var(--dark); }
+.timeline { max-width:680px; margin:0 auto; position:relative; padding:1rem 0; }
+.timeline::before { content:''; position:absolute; top:0; bottom:0; left:50%; width:1px; background:linear-gradient(to bottom,transparent,var(--pink),transparent); transform:translateX(-50%); }
+.timeline-item { display:grid; grid-template-columns:1fr 44px 1fr; gap:0; margin-bottom:3.5rem; align-items:center; }
+.timeline-content { padding:0 2rem; }
+.timeline-item:nth-child(odd)  .timeline-content:first-child { text-align:right; }
+.timeline-item:nth-child(odd)  .timeline-content:last-child  { opacity:0; pointer-events:none; }
+.timeline-item:nth-child(even) .timeline-content:first-child { opacity:0; pointer-events:none; }
+.timeline-dot { width:44px; height:44px; border-radius:50%; background:var(--dark); border:1px solid var(--pink); display:flex; align-items:center; justify-content:center; flex-shrink:0; position:relative; z-index:1; box-shadow:0 0 16px var(--pink-glow); }
+.timeline-dot-inner { width:10px; height:10px; border-radius:50%; background:var(--pink); }
+.timeline-year { font-size:.7rem; color:var(--pink); letter-spacing:.2em; margin-bottom:4px; text-transform:uppercase; }
+.timeline-event { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--white); font-weight:400; line-height:1.3; }
+.timeline-desc { font-size:.82rem; color:var(--muted); margin-top:5px; line-height:1.6; font-weight:300; }
+
+/* ══ CLOSING ══ */
+.closing-section { background:var(--black); text-align:center; padding:8rem 2rem; position:relative; overflow:hidden; }
+.closing-section::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 60% 70% at 50% 50%,rgba(255,45,120,.14) 0%,transparent 70%); pointer-events:none; }
+.closing-heart { display:inline-block; margin-bottom:2.5rem; animation:heartbeat 2.5s ease-in-out infinite; }
+.closing-quote { font-family:'Playfair Display',serif; font-style:italic; font-size:clamp(1.5rem,4vw,2.2rem); font-weight:400; color:var(--white); max-width:560px; margin:0 auto 1.5rem; line-height:1.6; }
+.closing-attr  { font-size:.6rem; letter-spacing:.3em; color:var(--muted); text-transform:uppercase; margin-bottom:2rem; }
+.closing-names { font-size:.6rem; letter-spacing:.35em; color:rgba(255,45,120,.5); text-transform:uppercase; margin-top:3rem; }
+
+/* ══ ANIMATIONS ══ */
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px);} to{opacity:1;transform:translateY(0);} }
+@keyframes fadeSoft { from{opacity:0;transform:translateY(14px);filter:blur(6px);} to{opacity:1;transform:translateY(0);filter:blur(0);} }
+@keyframes nameReveal {
+  0% { opacity:0; transform:translateY(42px) scale(.94); filter:blur(12px); }
+  58% { opacity:1; filter:blur(2px); }
+  100% { opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+}
+@keyframes ampBloom {
+  0% { opacity:0; transform:scale(.6) rotate(-8deg); filter:drop-shadow(0 0 0 rgba(255,45,120,0)); }
+  70% { opacity:1; transform:scale(1.12) rotate(0deg); filter:drop-shadow(0 0 18px rgba(255,45,120,.45)); }
+  100% { opacity:1; transform:scale(1) rotate(0deg); filter:drop-shadow(0 0 10px rgba(255,45,120,.28)); }
+}
+@keyframes continueReveal {
+  from { opacity:0; transform:translate(-50%,18px); filter:blur(8px); }
+  to { opacity:1; transform:translate(-50%,0); filter:blur(0); }
+}
+@keyframes scrollPulse { 0%,100%{opacity:.3;} 50%{opacity:1;} }
+@keyframes heartbeat { 0%,100%{transform:scale(1);} 14%{transform:scale(1.15);} 28%{transform:scale(1);} 42%{transform:scale(1.1);} 70%{transform:scale(1);} }
+
+.reveal { opacity:0; transform:translateY(28px); transition:opacity .9s ease,transform .9s ease; }
+.reveal.visible { opacity:1; transform:none; }
+
+/* ══ AUTO-SCROLL INDICATOR ══ */
+.autoscroll-toast {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 500;
+  background: rgba(255,45,120,0.12); border: 1px solid var(--border);
+  border-radius: 999px; padding: .5rem 1.2rem .5rem .8rem;
+  display: flex; align-items: center; gap: .6rem;
+  font-size: .62rem; letter-spacing: .15em; color: var(--muted);
+  text-transform: uppercase; backdrop-filter: blur(8px);
+  opacity: 0; transition: opacity .4s;
+  pointer-events: none;
+}
+.autoscroll-toast.visible { opacity: 1; pointer-events: auto; }
+.autoscroll-toast.hidden  { display: none; }
+.toast-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--pink); animation: pulseGlow 1.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.toast-stop {
+  cursor: pointer; pointer-events: auto;
+  margin-left: .4rem; color: var(--pink-soft);
+  font-size: .7rem; transition: color .2s;
+}
+.toast-stop:hover { color: var(--pink); }
+
+/* Book auto-open countdown ring */
+.book-timer-ring {
+  position: absolute; top: -8px; right: -8px;
+  width: 28px; height: 28px;
+  display: none;
+}
+.book-timer-ring.active { display: block; }
+.ring-bg   { fill: none; stroke: rgba(255,45,120,.15); stroke-width: 3; }
+.ring-fill { fill: none; stroke: var(--pink); stroke-width: 3; stroke-linecap: round;
+             stroke-dasharray: 69.1; stroke-dashoffset: 69.1;
+             transform: rotate(-90deg); transform-origin: center;
+             transition: stroke-dashoffset .1s linear; }
+
+/* ══ RESPONSIVE — all breakpoints ══ */
+
+/* ── Large desktop (1280px+) ── */
+@media(min-width:1280px){
+  .heart-gallery{ width:min(84vw, 980px); grid-template-rows:repeat(5,140px); gap:14px; }
+  .letter-paper{ padding:5rem; }
+}
+
+/* ── Tablet landscape / small laptop (768–1024px) ── */
+@media(max-width:1024px){
+  .heart-gallery{ width:min(88vw, 680px); grid-template-rows:repeat(5,105px); gap:10px; }
+  .count-block{ padding:1rem 1.4rem; }
+  .count-number{ font-size:2rem; }
+}
+
+/* ── Tablet portrait (600–768px) ── */
+@media(max-width:768px){
+  section{ padding:5rem 1.5rem; }
+  .hero{ padding:3rem 1.5rem 5rem; justify-content:center; }
+  .hero-glow{ width:470px; height:470px; }
+  .hero-names{ font-size:clamp(2rem,8vw,3.8rem); }
+  .hero-eyebrow{ font-size:.85rem; }
+  .hero-date{ font-size:.7rem; }
+
+  .countdown-wrap{ flex-wrap:wrap; border-radius:8px; }
+  .count-block{ padding:1rem 1.2rem; flex:1 1 40%; }
+  .count-block+.count-block{ border-left:none; border-top:1px solid var(--border); }
+  .count-block:nth-child(2){ border-left:1px solid var(--border); border-top:none; }
+  .count-block:nth-child(3){ border-left:none; }
+  .count-number{ font-size:2rem; }
+
+  .heart-gallery{ width:min(90vw, 560px); grid-template-rows:repeat(5,86px); gap:8px; }
+  .section-title{ font-size:1.8rem; margin-bottom:2.5rem; }
+
+  .letter-paper{ padding:2.5rem 2rem; }
+  .letter-greeting{ font-size:1.4rem; }
+  .letter-body{ font-size:.95rem; }
+
+  /* timeline stays two-column on tablet */
+  .timeline{ max-width:100%; }
+
+  .overlay-img-wrap img{ max-width:90vw; max-height:55vh; }
+
+  .autoscroll-toast{ bottom:1rem; right:1rem; }
+  .music-player{ bottom:1rem; left:1rem; }
+  .music-info{ max-width:100px; }
+}
+
+/* ── Large phone / small tablet (480–600px) ── */
+@media(max-width:600px){
+  section{ padding:4rem 1.2rem; }
+  .hero{ padding:2rem 1rem 4.2rem; min-height:100svh; justify-content:center; }
+  .hero-glow{ width:360px; height:360px; }
+  .hero-grid-lines{ background-size:42px 42px; }
+  .hero-names{ font-size:clamp(2rem,10.5vw,3.35rem); line-height:.98; width:100%; }
+  .hero-amp{ line-height:1.45; margin:.16rem 0; }
+  .hero-eyebrow{ font-size:.68rem; letter-spacing:.2em; margin-bottom:1.4rem; }
+  .hero-divider{ margin:1.55rem auto; gap:.85rem; }
+  .hero-date{ margin-bottom:1.7rem; line-height:1.7; max-width:18rem; }
+
+  .countdown-wrap{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); width:min(100%, 23rem); flex-wrap:nowrap; }
+  .count-block{ padding:.72rem .35rem; min-width:0; }
+  .count-block+.count-block{ border-top:none; border-left:1px solid var(--border); }
+  .count-block:nth-child(2), .count-block:nth-child(3){ border-top:none; border-left:1px solid var(--border); }
+  .count-number{ font-size:clamp(1.28rem, 7vw, 1.7rem); }
+  .count-label{ font-size:.5rem; }
+
+  .heart-gallery-reveal.active{ min-height:100svh; padding:1.5rem 0; }
+  .heart-reveal-msg{ margin-bottom:1.15rem; padding:0 .75rem; }
+  .heart-reveal-msg p{ font-size:clamp(1.55rem, 8.4vw, 2.25rem); }
+  .heart-kicker{ font-size:.56rem; letter-spacing:.26em; margin-bottom:.55rem; }
+  .heart-subcopy{ font-size:.82rem; line-height:1.55; margin-top:.65rem; max-width:22rem; }
+  .heart-gallery{ width:min(94vw, 430px); grid-template-rows:repeat(5, minmax(58px, 14.8vw)); gap:6px; }
+  .heart-final-note{ margin-top:1.1rem; padding:0 .9rem; font-size:clamp(.98rem, 5vw, 1.25rem); line-height:1.45; }
+  .heart-signoff{ font-size:.52rem; letter-spacing:.22em; margin-top:.45rem; }
+  .photo-ph svg{ display:none; } .photo-ph{ font-size:0; }
+
+  .book-scene{ width:130px; height:165px; }
+
+  /* timeline → single column */
+  .timeline::before{ left:18px; transform:none; }
+  .timeline-item{ display:block; position:relative; padding-left:3rem; margin-bottom:2.2rem; }
+  .timeline-dot{ position:absolute; left:0; top:2px; width:36px; height:36px; }
+  .timeline-content{ display:none !important; padding:0;
+    text-align:left !important; opacity:1 !important; pointer-events:auto !important; }
+  .timeline-content:has(.timeline-event){ display:block !important; }
+  .timeline-event{ font-size:1.05rem; }
+  .timeline-desc{ font-size:.78rem; }
+
+  .letter-paper{ padding:2rem 1.2rem; }
+  .letter-greeting{ font-size:1.2rem; }
+  .letter-body{ font-size:.9rem; line-height:1.85; }
+
+  .section-title{ font-size:1.6rem; margin-bottom:2rem; }
+  .section-label{ font-size:.55rem; }
+
+  .overlay-img-wrap img{ max-width:95vw; max-height:52vh; border-radius:10px; }
+  .overlay-ph{ width:95vw; height:48vh; }
+  .overlay-caption{ font-size:.95rem; }
+  .overlay-next{ font-size:.75rem; padding:.75rem 1.8rem; }
+  .overlay-dots{ gap:4px; }
+  .overlay-dot{ width:5px; height:5px; }
+
+  .closing-quote{ font-size:1.3rem; }
+  .closing-section{ padding:5rem 1.2rem; }
+
+  .music-player{
+    top:calc(.75rem + env(safe-area-inset-top));
+    right:.75rem; bottom:auto; left:auto;
+    gap:0; padding:.38rem;
+    max-width:none;
+    border-color:rgba(255,45,120,.26);
+    background:rgba(10,10,15,.72);
+  }
+  .music-info,
+  .music-bars,
+  .music-volume{ display:none; }
+  .music-btn{ width:36px; height:36px; font-size:.82rem; box-shadow:0 0 16px rgba(255,45,120,.36); }
+  .autoscroll-toast{ font-size:.56rem; padding:.4rem .9rem .4rem .6rem; }
+}
+
+/* ── Small phones (< 390px — iPhone SE, Galaxy A series) ── */
+@media(max-width:390px){
+  .hero-names{ font-size:clamp(1.6rem,10vw,2.8rem); }
+  .hero{ padding-top:1.4rem; padding-bottom:3.8rem; }
+  .hero-eyebrow{ letter-spacing:.16em; margin-bottom:1.1rem; }
+  .hero-date{ font-size:.62rem; margin-bottom:1.2rem; }
+  .hero-divider{ margin:1.15rem auto; }
+  .hero-divider-line{ width:50px; }
+
+  .countdown-wrap{ grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .count-block{ border-top:none !important; border-left:1px solid var(--border) !important; padding:.62rem .22rem; }
+  .count-block:first-child{ border-left:none !important; }
+  .count-number{ font-size:1.28rem; }
+  .count-label{ font-size:.43rem; letter-spacing:.16em; }
+
+  .heart-gallery-reveal.active{ padding:.9rem 0; }
+  .heart-reveal-msg{ margin-bottom:.8rem; }
+  .heart-subcopy{ font-size:.76rem; line-height:1.45; }
+  .heart-gallery{ width:min(94vw, 350px); grid-template-rows:repeat(5, minmax(46px, 13.8vw)); gap:5px; border-radius:6px; }
+  .heart-final-note{ margin-top:.85rem; font-size:.96rem; }
+  .photo-cell{ border-radius:6px; }
+
+  .book-scene{ width:110px; height:140px; }
+  .book-title{ font-size:.75rem; }
+
+  .letter-paper{ padding:1.5rem 1rem; }
+  .letter-body{ font-size:.85rem; }
+
+  .music-player{ padding:.34rem; }
+  .music-btn{ width:34px; height:34px; font-size:.78rem; }
+}
+
+/* ── iOS safe areas (notch / home bar) ── */
+@supports(padding-bottom: env(safe-area-inset-bottom)){
+  .music-player{ bottom:calc(1rem + env(safe-area-inset-bottom)); }
+  .autoscroll-toast{ bottom:calc(1rem + env(safe-area-inset-bottom)); }
+  .hero{ padding-bottom:calc(5rem + env(safe-area-inset-bottom)); }
+}
+
+@media(max-width:600px){
+  @supports(padding-bottom: env(safe-area-inset-bottom)){
+    .music-player{ top:calc(.75rem + env(safe-area-inset-top)); bottom:auto; }
+  }
+}
+
+/* ── Disable backdrop-filter on iOS Safari (causes blank sections) ── */
+@supports not (backdrop-filter: blur(1px)){
+  .countdown-wrap{ backdrop-filter:none; -webkit-backdrop-filter:none; background:rgba(255,45,120,0.08); }
+  .music-player{ backdrop-filter:none; -webkit-backdrop-filter:none; background:rgba(10,10,15,0.95); }
+  .hero-continue{ backdrop-filter:none; -webkit-backdrop-filter:none; background:rgba(255,45,120,0.12); }
+  .photo-overlay{ backdrop-filter:none; -webkit-backdrop-filter:none; }
+}
+
+/* ── Reduced motion ── */
+@media(prefers-reduced-motion:reduce){
+  *, *::before, *::after{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="scroll-bar" id="scrollBar"></div>
+
+<div class="music-player" id="musicPlayer">
+  <div class="music-bars paused" id="musicBars" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div class="music-info">
+    <span class="music-title">Anniversary Song</span>
+    <span class="music-sub" id="musicStatus">Tap to play</span>
+  </div>
+  <button class="music-btn" id="musicBtn" type="button" aria-label="Play music">&gt;</button>
+  <input class="music-volume" id="musicVolume" type="range" min="0" max="1" step="0.01" value="0.6" aria-label="Music volume">
+  <audio id="bgMusic" src="music.mp3" preload="auto" loop></audio>
+</div>
+
+<!-- ══ HERO ══ -->
+<section class="hero" id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-grid-lines"></div>
+  <div id="petals"></div>
+
+  <p class="hero-eyebrow">Our First Year Together</p>
+
+  <h1 class="hero-names">
+    <span class="name-line">Chan Nyein Han</span>
+    <span class="hero-amp">&amp;</span>
+    <span class="name-line">Su Su Hlaing</span>
+  </h1>
+
+  <div class="hero-divider">
+    <div class="hero-divider-line"></div>
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+      <path d="M10 17s-8-5.6-8-10a4 4 0 0 1 8 0 4 4 0 0 1 8 0c0 4.4-8 10-8 10z" fill="var(--pink)"/>
+    </svg>
+    <div class="hero-divider-line"></div>
+  </div>
+
+  <p class="hero-date">April 26, 2025 &nbsp;·&nbsp; One beautiful year</p>
+
+  <div class="countdown-wrap" id="countdown">
+    <div class="count-block"><span class="count-number" id="cd-days">--</span><span class="count-label">Days</span></div>
+    <div class="count-block"><span class="count-number" id="cd-hrs">--</span><span class="count-label">Hours</span></div>
+    <div class="count-block"><span class="count-number" id="cd-min">--</span><span class="count-label">Min</span></div>
+    <div class="count-block"><span class="count-number" id="cd-sec">--</span><span class="count-label">Sec</span></div>
+  </div>
+
+  <button class="hero-continue" id="continueBtn" type="button" onclick="continueFromHero()">
+    Continue
+    <span class="continue-mark" aria-hidden="true">v</span>
+  </button>
+</section>
+
+<!-- ══ GALLERY ══ -->
+<section class="gallery-section" id="gallery">
+  <p class="section-label reveal">Our Moments</p>
+  <h2 class="section-title reveal">A Year in Photographs</h2>
+
+  <!-- BOOK TRIGGER -->
+  <div class="book-trigger reveal" id="bookTrigger" onclick="openBook()">
+    <div class="book-scene" style="position:relative;">
+      <svg class="book-timer-ring" id="bookRing" viewBox="0 0 28 28">
+        <circle class="ring-bg"   cx="14" cy="14" r="11"/>
+        <circle class="ring-fill" id="ringFill" cx="14" cy="14" r="11"/>
+      </svg>
+      <div class="book-3d">
+        <div class="book-face">
+          <div class="book-icon">
+            <svg width="38" height="38" viewBox="0 0 52 52" fill="none">
+              <path d="M26 45s-19-11.5-19-22A9.5 9.5 0 0 1 26 17.3 9.5 9.5 0 0 1 45 23c0 10.5-19 22-19 22z" fill="var(--pink)" opacity="0.9"/>
+            </svg>
+          </div>
+          <div class="book-title">Our<br>Memory<br>Book</div>
+        </div>
+        <div class="book-spine"></div>
+      </div>
+    </div>
+    <p class="book-cta">✦ Click to open our album ✦</p>
+  </div>
+
+  <!-- HEART GALLERY (revealed after slideshow) -->
+  <div class="heart-gallery-reveal" id="heartReveal">
+    <div class="heart-reveal-msg" id="heartMsg">
+      <span class="heart-kicker">Our first year</span>
+      <div class="heart-subcopy">All these little days became our favorite story. Thank you for every laugh, every soft moment, and every memory I get to keep with you.</div>
+      <p>Every moment that made us ♡</p>
+    </div>
+    <div class="heart-gallery">
+      <div class="photo-cell hA"><img src="photos/first days.jpg" alt="First days" class="photo-img"><div class="photo-caption">First days</div></div>
+      <div class="photo-cell hB"><img src="photos/smile.jpg" alt="That smile" class="photo-img"><div class="photo-caption">That smile</div></div>
+      <div class="photo-cell hC"><img src="photos/Sunshine.jpg" alt="Sunshine" class="photo-img"><div class="photo-caption">Sunshine</div></div>
+      <div class="photo-cell hD"><img src="photos/Birthday.jpg" alt="Birthday" class="photo-img"><div class="photo-caption">Birthday with her</div></div>
+      <div class="photo-cell hE"><img src="photos/us.jpg" alt="Us" class="photo-img"><div class="photo-caption">Us ♡</div></div>
+      <div class="photo-cell hF"><img src="photos/Night time.jpg" alt="Night out" class="photo-img"><div class="photo-caption">Night out</div></div>
+      <div class="photo-cell hG"><img src="photos/together.jpg" alt="Together" class="photo-img"><div class="photo-caption">Together</div></div>
+      <div class="photo-cell hH"><img src="photos/Memories.jpg" alt="Memories" class="photo-img"><div class="photo-caption">Memories</div></div>
+      <div class="photo-cell hI"><img src="photos/Cozy Days.jpg" alt="Cozy days" class="photo-img"><div class="photo-caption">Cozy days</div></div>
+      <div class="photo-cell hE2"><img src="photos/favourite.jpg" alt="My Favourite" class="photo-img"><div class="photo-caption">My favourite</div></div>
+      <div class="photo-cell hJ"><img src="photos/Trip.jpg" alt="Trip" class="photo-img"><div class="photo-caption">Our first trip</div></div>
+      <div class="photo-cell hK"><img src="photos/family.jpg" alt="Family time" class="photo-img"><div class="photo-caption">Family time</div></div>
+      <div class="photo-cell hL"><img src="photos/Just us.jpg" alt="Just us" class="photo-img"><div class="photo-caption">Just us</div></div>
+      <div class="photo-cell hM"><img src="photos/one year.jpg" alt="One year" class="photo-img"><div class="photo-caption">One year</div></div>
+      <div class="photo-cell hN"><img src="photos/always.jpg" alt="Always" class="photo-img"><div class="photo-caption">Always</div></div>
+      <div class="photo-cell hO"><img src="photos/heart.jpg" alt="Heart" class="photo-img"><div class="photo-caption">♡</div></div>
+    </div>
+    <div class="heart-final-note" id="heartFinalNote">
+      One year down, forever still unfolding.
+      <span class="heart-signoff">Chan &amp; Su · Always</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BOOK READER ══ -->
+<div class="book-reader" id="bookReader">
+  <div class="open-book" id="openBook">
+
+    <!-- Close -->
+    <button class="book-close" onclick="closeBookAndReveal()" aria-label="Close">x</button>
+
+    <!-- Spine -->
+    <div class="book-spine-center"></div>
+
+    <!-- Left page — caption + info -->
+    <div class="book-page-left" id="bookLeftPage">
+      <div class="left-page-quote" id="bookLeftQuote">"Every love story is beautiful,<br>but ours is my favourite."</div>
+      <div class="left-page-divider"></div>
+      <div class="left-page-caption" id="bookLeftCaption">—</div>
+      <div class="left-page-counter" id="bookLeftCounter">Memory 1</div>
+      <div class="left-page-number" id="bookPageNum">I</div>
+    </div>
+
+    <!-- Right page — photo with flip animation -->
+    <div class="book-page-right-wrap">
+      <div class="book-next-page" id="bookNextPage"></div>
+      <div class="book-page-right" id="bookPageRight">
+        <div class="page-front" id="bookPageFront">
+          <!-- photo injected here -->
+        </div>
+        <div class="page-back" id="bookPageBack"></div>
+      </div>
+      <div class="page-curl-shadow"></div>
+    </div>
+
+    <!-- Nav -->
+    <button class="book-nav book-nav-prev" id="bookPrev" onclick="bookPrevPage()" aria-label="Previous">‹</button>
+    <button class="book-nav book-nav-next" id="bookNext" onclick="bookNextPage()" aria-label="Next">›</button>
+
+    <!-- Dots -->
+    <div class="book-dots" id="bookDots"></div>
+    <div class="heart-burst" id="heartBurst" aria-hidden="true"></div>
+
+    <!-- Skip -->
+    <span class="book-skip" onclick="skipToHeart()">Skip to gallery ›</span>
+  </div>
+</div>
+
+<!-- ══ LETTER ══ -->
+<section class="letter-section">
+  <p class="section-label reveal">Written for you</p>
+  <h2 class="section-title reveal">A Letter</h2>
+  <div class="letter-paper reveal">
+    <p class="letter-greeting">ချစ်လေး,</p>
+    <div class="letter-body">
+      <p>A year ago, I could not have imagined what saying yes to you would begin. It has meant laughing until 2am, finding a hand that feels like home, and discovering a warmth I did not know I was missing.</p>
+      <p>Every ordinary day with you has felt like something I want to hold onto — morning coffee, late nights, the small things only we know. In all of it, you have been steady, and bright, and entirely yourself.</p>
+      <p>Thank you for choosing me. For your patience and your warmth and the way everything feels lighter when I'm with you. I am so proud that you are mine.</p>
+      <p>Here is to every year ahead — may they all feel as full as this first one has.</p>
+    </div>
+    <p class="letter-sign">All my love, always ♡</p>
+  </div>
+</section>
+
+<!-- ══ TIMELINE ══ -->
+<section class="timeline-section">
+  <p class="section-label reveal">How we got here</p>
+  <h2 class="section-title reveal">Our Story</h2>
+  <div class="timeline">
+    <div class="timeline-item reveal">
+      <div class="timeline-content"><p class="timeline-year">The beginning</p><p class="timeline-event">The first hello</p><p class="timeline-desc">A coincidence that changed everything.</p></div>
+      <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+      <div class="timeline-content"></div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-content"></div>
+      <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+      <div class="timeline-content"><p class="timeline-year">First date</p><p class="timeline-event">Just the two of us</p><p class="timeline-desc">Nervous, hopeful, and completely worth it.</p></div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-content"><p class="timeline-year">Making it official</p><p class="timeline-event">We chose each other</p><p class="timeline-desc">The best decision I ever made.</p></div>
+      <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+      <div class="timeline-content"></div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-content"></div>
+      <div class="timeline-dot"><div class="timeline-dot-inner"></div></div>
+      <div class="timeline-content"><p class="timeline-year">Our adventures</p><p class="timeline-event">Exploring together</p><p class="timeline-desc">Every new place better because you were there.</p></div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-content"><p class="timeline-year">One year ♡</p><p class="timeline-event">April 26, 2025</p><p class="timeline-desc">The first of many. Here's to us.</p></div>
+      <div class="timeline-dot" style="box-shadow:0 0 28px rgba(255,45,120,.6);"><div class="timeline-dot-inner"></div></div>
+      <div class="timeline-content"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CLOSING ══ -->
+<section class="closing-section">
+  <div class="closing-heart">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+      <path d="M26 45s-19-11.5-19-22A9.5 9.5 0 0 1 26 17.3 9.5 9.5 0 0 1 45 23c0 10.5-19 22-19 22z" fill="var(--pink)" opacity=".9"/>
+    </svg>
+  </div>
+  <p class="closing-quote reveal">"I have found the one whom my soul loves."</p>
+  <p class="closing-attr reveal">Song of Solomon 3:4</p>
+  <p class="closing-names reveal">Chan &amp; Su &nbsp;·&nbsp; April 26, 2025</p>
+</section>
+
+<!-- AUTO-SCROLL TOAST -->
+<div class="autoscroll-toast" id="autoToast">
+  <div class="toast-dot"></div>
+  <span>Auto scrolling</span>
+  <span class="toast-stop" onclick="stopAutoScroll()" title="Stop">■ Stop</span>
+</div>
+
+<script>
+/* ── FLOATING PETALS ── */
+(function(){
+  const container = document.getElementById('petals');
+  const emojis = ['🌸','🌷','✨','💗','🩷'];
+  for(let i=0;i<18;i++){
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      font-size:${Math.random()*14+8}px;
+      animation-duration:${Math.random()*14+8}s;
+      animation-delay:${Math.random()*12}s;
+    `;
+    container.appendChild(p);
+  }
+})();
+
+/* ── SCROLL PROGRESS BAR ── */
+window.addEventListener('scroll',function(){
+  const pct = window.scrollY/(document.body.scrollHeight-window.innerHeight)*100;
+  document.getElementById('scrollBar').style.width = Math.min(pct,100)+'%';
+}, {passive:true});
+
+/* ── COUNTDOWN (counts UP from anniversary) ── */
+(function(){
+  const d = new Date('2025-04-26T00:00:00');
+  function pad(n){return String(n).padStart(2,'0');}
+  function tick(){
+    const s = Math.floor(Math.max(0,Date.now()-d)/1000);
+    document.getElementById('cd-days').textContent=pad(Math.floor(s/86400));
+    document.getElementById('cd-hrs').textContent =pad(Math.floor((s%86400)/3600));
+    document.getElementById('cd-min').textContent =pad(Math.floor((s%3600)/60));
+    document.getElementById('cd-sec').textContent =pad(s%60);
+  }
+  tick(); setInterval(tick,1000);
+})();
+
+/* ── SCROLL REVEAL ── */
+(function(){
+  const obs = new IntersectionObserver(
+    es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),
+    {threshold:.1}
+  );
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+})();
+
+/* Music player */
+(function(){
+  const audio = document.getElementById('bgMusic');
+  const btn = document.getElementById('musicBtn');
+  const vol = document.getElementById('musicVolume');
+  const bars = document.getElementById('musicBars');
+  const status = document.getElementById('musicStatus');
+  if(!audio || !btn || !vol) return;
+
+  let userPaused = false;
+  let autoUnlocked = false;
+  audio.volume = Number(vol.value);
+  vol.style.setProperty('--vol', (audio.volume * 100) + '%');
+
+  function syncMusicUI(){
+    const playing = !audio.paused && !audio.ended;
+    btn.textContent = playing ? 'II' : '>';
+    btn.setAttribute('aria-label', playing ? 'Pause music' : 'Play music');
+    status.textContent = playing ? 'Playing softly' : 'Tap to play';
+    bars.classList.toggle('paused', !playing);
+  }
+
+  async function playMusic(source){
+    if(userPaused && source !== 'button') return false;
+    try {
+      await audio.play();
+      autoUnlocked = true;
+      syncMusicUI();
+      return true;
+    } catch(err) {
+      syncMusicUI();
+      status.textContent = source === 'load' ? 'Tap anywhere' : 'Tap again';
+      return false;
+    }
+  }
+
+  async function toggleMusic(){
+    if(audio.paused){
+      userPaused = false;
+      await playMusic('button');
+    } else {
+      userPaused = true;
+      audio.pause();
+      syncMusicUI();
+    }
+  }
+
+  btn.addEventListener('click', toggleMusic);
+  vol.addEventListener('input', function(){
+    audio.volume = Number(vol.value);
+    vol.style.setProperty('--vol', (audio.volume * 100) + '%');
+  });
+  audio.addEventListener('play', syncMusicUI);
+  audio.addEventListener('pause', syncMusicUI);
+  audio.addEventListener('error', function(){ status.textContent = 'Music unavailable'; });
+  syncMusicUI();
+  playMusic('load');
+
+  function unlockOnGesture(){
+    if(!autoUnlocked && audio.paused && !userPaused) playMusic('gesture');
+  }
+  ['pointerdown','touchstart','keydown','scroll'].forEach(function(evt){
+    window.addEventListener(evt, unlockOnGesture, {passive:true, once:false});
+  });
+  window.startAnniversaryMusic = function(){
+    userPaused = false;
+    return playMusic('button');
+  };
+})();
+
+/* ══════════════════════════════════════════
+   AUTO-SCROLL ENGINE
+   - Smooth cinematic scroll through entire page
+   - Pauses when user manually scrolls or interacts
+   - Resumes after 4s of inactivity
+   - Shows toast indicator; Stop button halts it permanently
+══════════════════════════════════════════ */
+const AUTO_SCROLL_SPEED   = 0.6;   // px per animation frame (~36px/s at 60fps)
+const AUTO_SCROLL_DELAY   = 3200;  // ms before auto-scroll starts after load
+const AUTO_SCROLL_RESUME  = 4000;  // ms after user stops touching before resuming
+
+let autoScrollActive   = false;
+let autoScrollStopped  = false; // permanently stopped by user
+let autoScrollRAF      = null;
+let autoScrollResume   = null;
+let lastScrollY        = -1;
+let userScrolling      = false;
+let introContinued     = false;
+let galleryEntrancePending = false;
+const toast            = document.getElementById('autoToast');
+
+function startAutoScroll(){
+  if(autoScrollStopped || !introContinued) return;
+  autoScrollActive = true;
+  toast.classList.add('visible');
+  cancelAnimationFrame(autoScrollRAF);
+  tickScroll();
+}
+
+function continueFromHero(){
+  introContinued = true;
+  autoScrollStopped = true;
+  galleryEntrancePending = true;
+  if(window.startAnniversaryMusic) window.startAnniversaryMusic();
+  const gallery = document.getElementById('gallery');
+  if(gallery){
+    gallery.classList.remove('gallery-entering');
+    void gallery.offsetWidth;
+    gallery.classList.add('gallery-entering');
+    gallery.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  clearInterval(bookAutoInterval);
+  setTimeout(()=>{
+    galleryEntrancePending = false;
+    if(!bookCountdownStarted) {
+      bookCountdownStarted = true;
+      startBookCountdown();
+    }
+  }, 1700);
+}
+
+function tickScroll(){
+  if(!autoScrollActive || autoScrollStopped){ return; }
+  const maxY = document.body.scrollHeight - window.innerHeight;
+  if(window.scrollY >= maxY - 2){
+    // reached bottom — stop
+    autoScrollActive = false;
+    toast.classList.remove('visible');
+    return;
+  }
+  window.scrollBy(0, AUTO_SCROLL_SPEED);
+  autoScrollRAF = requestAnimationFrame(tickScroll);
+}
+
+function pauseAutoScroll(){
+  autoScrollActive = false;
+  cancelAnimationFrame(autoScrollRAF);
+  toast.classList.remove('visible');
+  clearTimeout(autoScrollResume);
+  if(!autoScrollStopped){
+    autoScrollResume = setTimeout(()=>{
+      if(!autoScrollStopped) startAutoScroll();
+    }, AUTO_SCROLL_RESUME);
+  }
+}
+
+function stopAutoScroll(){
+  autoScrollStopped = true;
+  autoScrollActive  = false;
+  cancelAnimationFrame(autoScrollRAF);
+  clearTimeout(autoScrollResume);
+  toast.classList.remove('visible');
+  setTimeout(()=>toast.classList.add('hidden'), 500);
+}
+
+// Detect user scroll → pause
+window.addEventListener('wheel',   ()=>pauseAutoScroll(), {passive:true});
+window.addEventListener('touchmove',()=>pauseAutoScroll(), {passive:true});
+window.addEventListener('keydown', (e)=>{
+  if(['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(e.key)){
+    const overlay = document.getElementById('photoOverlay');
+    if(!overlay || !overlay.classList.contains('active'))
+      pauseAutoScroll();
+  }
+});
+
+// Start auto-scroll after delay
+setTimeout(()=>{
+  if(!autoScrollStopped && introContinued) startAutoScroll();
+}, AUTO_SCROLL_DELAY);
+
+
+/* ══════════════════════════════════════════
+   BOOK READER — animated page-turn gallery
+══════════════════════════════════════════ */
+const photos = [
+  {src:'photos/first days.jpg', caption:'First days',    quote:'"The beginning of us."'},
+  {src:'photos/smile.jpg',      caption:'That smile',    quote:'"The smile I fell in love with."'},
+  {src:'photos/Sunshine.jpg',   caption:'Sunshine',      quote:'"You light up every room."'},
+  {src:'photos/Birthday.jpg',   caption:'Birthday with her', quote:'"Every year with you is a gift."'},
+  {src:'photos/us.jpg',         caption:'Us ♡',          quote:'"My favourite place is next to you."'},
+  {src:'photos/Night time.jpg', caption:'Night out',     quote:'"Late nights always feel short with you."'},
+  {src:'photos/together.jpg',   caption:'Together',      quote:'"Better together, always."'},
+  {src:'photos/Memories.jpg',   caption:'Memories',      quote:'"These are the moments I keep."'},
+  {src:'photos/Cozy Days.jpg',  caption:'Cozy days',     quote:'"Home is wherever you are."'},
+  {src:'photos/favourite.jpg',  caption:'My favourite',  quote:'"Out of all my memories, this one."'},
+  {src:'photos/Trip.jpg',       caption:'Our first trip',quote:'"The first of many adventures."'},
+  {src:'photos/family.jpg',     caption:'Family time',   quote:'"The people who matter most."'},
+  {src:'photos/Just us.jpg',    caption:'Just us',       quote:'"Two is all we need."'},
+  {src:'photos/photo_14_2026-04-25_15-42-40.jpg', caption:'One year', quote:'"365 days of choosing each other."'},
+  {src:'photos/always.jpg',     caption:'Always',        quote:'"Now and for every year ahead."'},
+  {src:'photos/heart.jpg',      caption:'♡',             quote:'"I have found the one my soul loves."'},
+];
+
+const romanNumerals = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI'];
+const rots          = ['-8deg','5deg','-4deg','7deg','-5deg','3deg','-6deg','4deg'];
+
+let cur             = 0;
+let bookIsOpen      = false;
+let isFlipping      = false;
+let bookAutoTimer   = null;
+let bookAutoInterval= null;
+let photoAutoTimer  = null;
+const BOOK_AUTO_MS  = 3200;
+const PHOTO_AUTO_MS = 4600;
+const PAGE_FLIP_MS  = 1350;
+const BOOK_OPEN_MS  = 1650;
+const BOOK_CLOSE_MS = 1550;
+
+/* ── Build progress dots ── */
+const bookDotsWrap = document.getElementById('bookDots');
+photos.forEach((_,i)=>{
+  const d = document.createElement('div');
+  d.className = 'book-dot' + (i===0 ? ' active' : '');
+  d.id = 'bdot-' + i;
+  bookDotsWrap.appendChild(d);
+});
+
+function updateDots(idx){
+  document.querySelectorAll('.book-dot').forEach((d,i)=>d.classList.toggle('active', i===idx));
+}
+
+/* ── Update left page content ── */
+function updateLeftPage(idx){
+  const p = photos[idx];
+  document.getElementById('bookLeftCaption').textContent  = p.caption;
+  document.getElementById('bookLeftCounter').textContent  = 'Memory ' + (idx+1) + ' of ' + photos.length;
+  document.getElementById('bookPageNum').textContent      = romanNumerals[idx] || (idx+1);
+  document.getElementById('bookLeftQuote').innerHTML      = p.quote;
+}
+
+/* ── Inject photo into right page ── */
+function photoMarkup(p){
+  if(p.src){
+    return '<div class="page-photo-bg" style="background-image:url(&quot;' + p.src + '&quot;)"></div><img src="' + p.src + '" alt="' + p.caption + '">';
+  }
+  return '<div class="page-front-ph"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7a7490" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span style="font-size:.78rem;color:var(--muted);letter-spacing:.06em;">Add your photo</span></div>';
+}
+
+function setPagePhoto(idx){
+  document.getElementById('bookPageFront').innerHTML = photoMarkup(photos[idx]);
+}
+
+/* ── Show a specific page with flip animation ── */
+function showPage(idx, direction){
+  if(isFlipping) return;
+  isFlipping = true;
+
+  const pageEl = document.getElementById('bookPageRight');
+  const backEl = document.getElementById('bookPageBack');
+  const nextEl = document.getElementById('bookNextPage');
+  backEl.innerHTML = '';
+  nextEl.innerHTML = photoMarkup(photos[idx]);
+
+  pageEl.classList.add('flipped');
+
+  setTimeout(()=>{
+    cur = idx;
+    setPagePhoto(idx);
+    updateLeftPage(idx);
+    updateDots(idx);
+    document.getElementById('bookNext').style.opacity = idx < photos.length-1 ? '1' : '0.3';
+    document.getElementById('bookPrev').style.opacity = idx > 0 ? '1' : '0.3';
+
+    pageEl.classList.add('no-transition');
+    pageEl.classList.remove('flipped');
+    nextEl.innerHTML = '';
+    pageEl.offsetHeight;
+    pageEl.classList.remove('no-transition');
+    isFlipping = false;
+  }, PAGE_FLIP_MS);
+}
+
+/* ── Auto advance pages ── */
+function schedulePageAuto(){
+  clearTimeout(photoAutoTimer);
+  photoAutoTimer = setTimeout(()=>{
+    if(bookIsOpen){
+      if(cur < photos.length - 1){
+        showPage(cur + 1, 'next');
+        schedulePageAuto();
+      } else {
+        // last page — close and reveal heart
+        setTimeout(()=>{ closeBookAndReveal(); }, 1800);
+      }
+    }
+  }, PHOTO_AUTO_MS);
+}
+
+/* ── Book auto-open countdown ── */
+function startBookCountdown(){
+  const ring        = document.getElementById('bookRing');
+  const ringFill    = document.getElementById('ringFill');
+  const circumference = 69.1;
+  ring.classList.add('active');
+  let elapsed = 0;
+  const step  = 50;
+
+  bookAutoInterval = setInterval(()=>{
+    elapsed += step;
+    ringFill.style.strokeDashoffset = circumference * (1 - elapsed / BOOK_AUTO_MS);
+    if(elapsed >= BOOK_AUTO_MS){
+      clearInterval(bookAutoInterval);
+      ring.classList.remove('active');
+      openBook();
+    }
+  }, step);
+}
+
+/* Watch gallery scroll into view */
+const gallerySection = document.getElementById('gallery');
+let bookCountdownStarted = false;
+const galleryObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting && introContinued && !galleryEntrancePending && !bookCountdownStarted){
+      bookCountdownStarted = true;
+      startBookCountdown();
+    }
+  });
+}, {threshold:0.4});
+galleryObserver.observe(gallerySection);
+
+/* ── Open book ── */
+function openBook(){
+  clearInterval(bookAutoInterval);
+  autoScrollActive = false;
+  cancelAnimationFrame(autoScrollRAF);
+  clearTimeout(autoScrollResume);
+  document.getElementById('bookRing').classList.remove('active');
+  document.getElementById('bookTrigger').classList.add('hidden');
+
+  pauseAutoScroll();
+  autoScrollStopped = true;
+  toast.classList.add('hidden');
+
+  const reader = document.getElementById('bookReader');
+  const book   = document.getElementById('openBook');
+
+  cur = 0;
+  setPagePhoto(0);
+  updateLeftPage(0);
+  updateDots(0);
+  document.getElementById('bookPrev').style.opacity = '0.3';
+  document.getElementById('bookNext').style.opacity = '1';
+
+  // Reset flip state
+  document.getElementById('bookPageRight').classList.remove('flipped');
+  document.getElementById('bookPageRight').classList.remove('no-transition');
+  document.getElementById('bookPageBack').innerHTML = '';
+  document.getElementById('bookNextPage').innerHTML = '';
+
+  reader.classList.add('active');
+  document.body.classList.add('book-open');
+  book.classList.remove('closing');
+  book.classList.remove('revealing-heart');
+  book.classList.add('entering');
+  bookIsOpen = true;
+
+  setTimeout(()=>{ book.classList.remove('entering'); }, BOOK_OPEN_MS);
+
+  // Start auto-advance
+  schedulePageAuto();
+}
+
+/* ── Nav buttons ── */
+function bookNextPage(){
+  clearTimeout(photoAutoTimer);
+  if(cur < photos.length - 1){
+    showPage(cur + 1, 'next');
+    schedulePageAuto();
+  } else {
+    closeBookAndReveal();
+  }
+}
+
+function bookPrevPage(){
+  clearTimeout(photoAutoTimer);
+  if(cur > 0){
+    showPage(cur - 1, 'prev');
+    schedulePageAuto();
+  }
+}
+
+/* ── Close book reader ── */
+function closeBookReader(){
+  clearTimeout(photoAutoTimer);
+  const reader = document.getElementById('bookReader');
+  const book   = document.getElementById('openBook');
+  book.classList.remove('revealing-heart');
+  book.classList.add('closing');
+  bookIsOpen = false;
+  setTimeout(()=>{
+    reader.classList.remove('active');
+    book.classList.remove('closing');
+    document.body.classList.remove('book-open');
+  }, BOOK_CLOSE_MS);
+}
+
+/* ── Close book then reveal heart ── */
+function closeBookAndReveal(){
+  if(!bookIsOpen && !document.getElementById('bookReader').classList.contains('active')) return;
+  clearTimeout(photoAutoTimer);
+  const reader = document.getElementById('bookReader');
+  const book   = document.getElementById('openBook');
+  const burst  = document.getElementById('heartBurst');
+  book.classList.add('revealing-heart');
+  book.classList.add('closing');
+  burst.classList.remove('active');
+  void burst.offsetWidth;
+  burst.classList.add('active');
+  bookIsOpen = false;
+  setTimeout(()=>{
+    reader.classList.remove('active');
+    book.classList.remove('closing');
+    book.classList.remove('revealing-heart');
+    burst.classList.remove('active');
+    document.body.classList.remove('book-open');
+    revealHeart();
+  }, BOOK_CLOSE_MS);
+}
+
+/* ── Skip straight to heart ── */
+function skipToHeart(){
+  clearTimeout(photoAutoTimer);
+  closeBookAndReveal();
+}
+
+/* keyboard nav */
+document.addEventListener('keydown',function(e){
+  if(!bookIsOpen) return;
+  if(e.key==='ArrowRight'||e.key===' '){ e.preventDefault(); bookNextPage(); }
+  if(e.key==='ArrowLeft'){ e.preventDefault(); bookPrevPage(); }
+  if(e.key==='Escape'){ closeBookAndReveal(); }
+});
+
+/* Touch swipe on the book */
+(function(){
+  let startX = 0;
+  const reader = document.getElementById('bookReader');
+  reader.addEventListener('touchstart', e=>{ startX = e.touches[0].clientX; }, {passive:true});
+  reader.addEventListener('touchend',   e=>{
+    const dx = e.changedTouches[0].clientX - startX;
+    if(Math.abs(dx) > 40){
+      if(dx < 0) bookNextPage(); else bookPrevPage();
+    }
+  }, {passive:true});
+})();
+
+/* ── Reveal heart mosaic ── */
+function revealHeart(){
+  const rev = document.getElementById('heartReveal');
+  const msg = document.getElementById('heartMsg');
+  const finalNote = document.getElementById('heartFinalNote');
+  const gallery = document.getElementById('gallery');
+  if(gallery) gallery.classList.add('heart-mode');
+  rev.classList.add('active');
+  setTimeout(()=>msg.classList.add('visible'),100);
+  setTimeout(()=>{ if(finalNote) finalNote.classList.add('visible'); }, 650);
+
+  const cells = rev.querySelectorAll('.photo-cell');
+  cells.forEach((cell,i)=>{
+    cell.style.setProperty('--rot', rots[i%rots.length]);
+    setTimeout(()=>cell.classList.add('pop'), 60*i);
+  });
+
+  const assembleDuration = 60 * cells.length + 800;
+  setTimeout(()=>{
+    rev.scrollIntoView({behavior:'smooth',block:'center'});
+    autoScrollStopped = false;
+    setTimeout(startAutoScroll, 2600);
+  }, assembleDuration);
+}
+</script>
+</body>
+</html>
