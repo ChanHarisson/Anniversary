@@ -760,10 +760,10 @@ body.book-open { overflow: hidden; }
 .letter-section { background:var(--black); }
 .letter-paper { max-width:620px; margin:0 auto; background:var(--card-bg); border:1px solid var(--border); border-radius:6px; padding:4rem; position:relative; box-shadow:0 0 60px var(--pink-dim), inset 0 0 40px rgba(255,45,120,.02); }
 .letter-paper::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--pink),transparent); }
-.letter-greeting { font-family:'Playfair Display','Noto Sans Myanmar',serif; font-style:italic; font-size:1.6rem; color:var(--pink-soft); margin-bottom:2rem; }
-.letter-body { font-family:'Playfair Display','Noto Sans Myanmar',serif; font-size:1rem; line-height:2; color:rgba(245,240,248,.75); font-weight:300; }
-.letter-body p+p { margin-top:1.2rem; }
-.letter-sign { font-family:'Playfair Display','Noto Sans Myanmar',serif; font-style:italic; font-size:1.15rem; color:var(--pink); margin-top:2.5rem; text-align:right; }
+.letter-greeting { font-family:'Noto Sans Myanmar','DM Sans',sans-serif; font-size:1.18rem; line-height:1.9; color:var(--pink-soft); margin-bottom:1.55rem; font-weight:400; }
+.letter-body { font-family:'Noto Sans Myanmar','DM Sans',sans-serif; font-size:.98rem; line-height:2.15; color:rgba(245,240,248,.78); font-weight:300; letter-spacing:0; word-break:normal; overflow-wrap:break-word; }
+.letter-body p+p { margin-top:1.25rem; }
+.letter-sign { font-family:'Noto Sans Myanmar','DM Sans',sans-serif; font-size:1rem; line-height:1.9; color:var(--pink); margin-top:2.4rem; text-align:right; font-weight:400; }
 
 /* ══ TIMELINE ══ */
 .timeline-section { background:var(--dark); }
@@ -884,7 +884,7 @@ body.book-open { overflow: hidden; }
   .section-title{ font-size:1.8rem; margin-bottom:2.5rem; }
 
   .letter-paper{ padding:2.5rem 2rem; }
-  .letter-greeting{ font-size:1.4rem; }
+  .letter-greeting{ font-size:1.08rem; }
   .letter-body{ font-size:.95rem; }
 
   /* timeline stays two-column on tablet */
@@ -939,8 +939,8 @@ body.book-open { overflow: hidden; }
   .timeline-desc{ font-size:.78rem; }
 
   .letter-paper{ padding:2rem 1.2rem; }
-  .letter-greeting{ font-size:1.2rem; }
-  .letter-body{ font-size:.9rem; line-height:1.85; }
+  .letter-greeting{ font-size:1rem; }
+  .letter-body{ font-size:.9rem; line-height:2.05; }
 
   .section-title{ font-size:1.6rem; margin-bottom:2rem; }
   .section-label{ font-size:.55rem; }
@@ -996,7 +996,7 @@ body.book-open { overflow: hidden; }
   .book-title{ font-size:.75rem; }
 
   .letter-paper{ padding:1.5rem 1rem; }
-  .letter-body{ font-size:.85rem; }
+  .letter-body{ font-size:.86rem; line-height:2; }
 
   .music-player{ padding:.34rem; }
   .music-btn{ width:34px; height:34px; font-size:.78rem; }
@@ -1191,8 +1191,8 @@ body.book-open { overflow: hidden; }
   <p class="section-label reveal">Written for you</p>
   <h2 class="section-title reveal">A Letter</h2>
   <div class="letter-paper reveal">
-    <p class="letter-greeting">ချစ်လေး,</p>
-    <div class="letter-body">
+    <p class="letter-greeting" lang="my">ချစ်လေး,</p>
+    <div class="letter-body" lang="my">
       <p>A year ago, I could not have imagined what saying yes to you would begin. It has meant laughing until 2am, finding a hand that feels like home, and discovering a warmth I did not know I was missing.</p>
       <p>Every ordinary day with you has felt like something I want to hold onto — morning coffee, late nights, the small things only we know. In all of it, you have been steady, and bright, and entirely yourself.</p>
       <p>Thank you for choosing me. For your patience and your warmth and the way everything feels lighter when I'm with you. I am so proud that you are mine.</p>
@@ -1379,12 +1379,15 @@ window.addEventListener('scroll',function(){
    - Resumes after 4s of inactivity
    - Shows toast indicator; Stop button halts it permanently
 ══════════════════════════════════════════ */
-const AUTO_SCROLL_SPEED   = 0.6;   // px per animation frame (~36px/s at 60fps)
+const AUTO_SCROLL_SPEED   = 0.95;  // px per animation frame (~57px/s at 60fps)
 const AUTO_SCROLL_DELAY   = 3200;  // ms before auto-scroll starts after load
 const AUTO_SCROLL_RESUME  = 4000;  // ms after user stops touching before resuming
+const AUTO_SCROLL_AFTER_GALLERY = 1400;
 
 let autoScrollActive   = false;
-let autoScrollStopped  = false; // permanently stopped by user
+let autoScrollStopped  = false;
+let autoScrollUserStopped = false;
+let autoScrollHeldForGallery = false;
 let autoScrollRAF      = null;
 let autoScrollResume   = null;
 let lastScrollY        = -1;
@@ -1394,16 +1397,35 @@ let galleryEntrancePending = false;
 const toast            = document.getElementById('autoToast');
 
 function startAutoScroll(){
-  if(autoScrollStopped || !introContinued) return;
+  if(autoScrollStopped || autoScrollUserStopped || autoScrollHeldForGallery || !introContinued) return;
   autoScrollActive = true;
   toast.classList.add('visible');
   cancelAnimationFrame(autoScrollRAF);
   tickScroll();
 }
 
+function holdAutoScrollForGallery(){
+  autoScrollHeldForGallery = true;
+  autoScrollStopped = true;
+  autoScrollActive = false;
+  cancelAnimationFrame(autoScrollRAF);
+  clearTimeout(autoScrollResume);
+  toast.classList.remove('visible');
+  toast.classList.add('hidden');
+}
+
+function resumeAutoScrollAfterGallery(){
+  if(autoScrollUserStopped) return;
+  autoScrollHeldForGallery = false;
+  autoScrollStopped = false;
+  toast.classList.remove('hidden');
+  clearTimeout(autoScrollResume);
+  setTimeout(startAutoScroll, AUTO_SCROLL_AFTER_GALLERY);
+}
+
 function continueFromHero(){
   introContinued = true;
-  autoScrollStopped = true;
+  holdAutoScrollForGallery();
   galleryEntrancePending = true;
   if(window.startAnniversaryMusic) window.startAnniversaryMusic();
   const gallery = document.getElementById('gallery');
@@ -1441,14 +1463,16 @@ function pauseAutoScroll(){
   cancelAnimationFrame(autoScrollRAF);
   toast.classList.remove('visible');
   clearTimeout(autoScrollResume);
-  if(!autoScrollStopped){
+  if(!autoScrollStopped && !autoScrollUserStopped && !autoScrollHeldForGallery){
     autoScrollResume = setTimeout(()=>{
-      if(!autoScrollStopped) startAutoScroll();
+      if(!autoScrollStopped && !autoScrollUserStopped && !autoScrollHeldForGallery) startAutoScroll();
     }, AUTO_SCROLL_RESUME);
   }
 }
 
 function stopAutoScroll(){
+  autoScrollUserStopped = true;
+  autoScrollHeldForGallery = false;
   autoScrollStopped = true;
   autoScrollActive  = false;
   cancelAnimationFrame(autoScrollRAF);
@@ -1633,15 +1657,10 @@ galleryObserver.observe(gallerySection);
 function openBook(){
   introContinued = true;
   clearInterval(bookAutoInterval);
-  autoScrollActive = false;
-  cancelAnimationFrame(autoScrollRAF);
-  clearTimeout(autoScrollResume);
   document.getElementById('bookRing').classList.remove('active');
   document.getElementById('bookTrigger').classList.add('hidden');
 
-  pauseAutoScroll();
-  autoScrollStopped = true;
-  toast.classList.add('hidden');
+  holdAutoScrollForGallery();
 
   const reader = document.getElementById('bookReader');
   const book   = document.getElementById('openBook');
@@ -1779,9 +1798,7 @@ function revealHeart(){
   const assembleDuration = 60 * cells.length + 800;
   setTimeout(()=>{
     rev.scrollIntoView({behavior:'smooth',block:'center'});
-    autoScrollStopped = false;
-    toast.classList.remove('hidden');
-    setTimeout(startAutoScroll, 2600);
+    resumeAutoScrollAfterGallery();
   }, assembleDuration);
 }
 </script>
